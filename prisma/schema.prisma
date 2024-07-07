@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  ADMIN
+  ORGANIZATION
+  USER
+}
+
+enum TaskType {
+  TASK
+  ORDER
+  GOAL
+}
+
+enum RecurrenceType {
+  DAILY
+  WEEKLY
+  EXACT
+  MONTHLY
+  ANNUALLY
+}
+
+model User {
+  id               String        @id @default(uuid())
+  name             String
+  email            String        @unique
+  phone            String?
+  userType         UserType      @default(USER)
+  ownsOrganization Organization?
+
+  partOfOrganization   Organization @relation(name: "partOf", fields: [partOfOrganizationId], references: [id])
+  partOfOrganizationId String
+
+  tasksAssigned    Task[]
+  tasksCreated     Task[]     @relation(name: "task_creator")
+  taskListsCreated TaskList[] @relation(name: "task_list_creator")
+
+  @@map("users")
+}
+
+model Organization {
+  id          String @id @default(uuid())
+  name        String
+  fantasyName String
+  cnpj        String
+  owner       User   @relation(fields: [ownerId], references: [id])
+  ownerId     String @unique
+
+  users User[] @relation(name: "partOf")
+
+  tasks Task[]
+
+  taskLists TaskList[]
+
+  @@map("organizations")
+}
+
+model Task {
+  id             BigInt         @id @default(autoincrement())
+  title          String
+  desciption     String
+  recurrenceType RecurrenceType
+  taskType       TaskType
+
+  createDate DateTime  @default(now())
+  dueDate    DateTime?
+
+  assignees User[]
+
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+
+  creator   User   @relation(name: "task_creator", fields: [creatorId], references: [id])
+  creatorId String
+
+  lists TaskList[]
+
+  @@map("tasks")
+}
+
+model TaskList {
+  id          BigInt @id @default(autoincrement())
+  title       String
+  description String
+
+  tasks Task[]
+
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+
+  creator   User   @relation(name: "task_list_creator", fields: [creatorId], references: [id])
+  creatorId String
+
+  @@map("taskLists")
+}
