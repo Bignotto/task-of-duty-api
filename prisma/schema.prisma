@@ -35,8 +35,8 @@ model User {
   userType         UserType      @default(USER)
   ownsOrganization Organization?
 
-  partOfOrganization   Organization @relation(name: "partOf", fields: [partOfOrganizationId], references: [id])
-  partOfOrganizationId String
+  partOfOrganization   Organization? @relation(name: "partOf", fields: [partOfOrganizationId], references: [id])
+  partOfOrganizationId String?
 
   tasksAssigned    Task[]
   tasksCreated     Task[]     @relation(name: "task_creator")

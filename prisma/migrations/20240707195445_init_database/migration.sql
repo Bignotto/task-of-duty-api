@@ -46,14 +46,14 @@ CREATE TABLE "tasks" (
 );
 
 -- CreateTable
-CREATE TABLE "TaskList" (
+CREATE TABLE "taskLists" (
     "id" BIGSERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "organizationId" TEXT,
     "creatorId" TEXT NOT NULL,
 
-    CONSTRAINT "TaskList_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "taskLists_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -99,10 +99,10 @@ ALTER TABLE "tasks" ADD CONSTRAINT "tasks_organizationId_fkey" FOREIGN KEY ("org
 ALTER TABLE "tasks" ADD CONSTRAINT "tasks_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TaskList" ADD CONSTRAINT "TaskList_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "taskLists" ADD CONSTRAINT "taskLists_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TaskList" ADD CONSTRAINT "TaskList_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "taskLists" ADD CONSTRAINT "taskLists_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_TaskToUser" ADD CONSTRAINT "_TaskToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "tasks"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -114,4 +114,4 @@ ALTER TABLE "_TaskToUser" ADD CONSTRAINT "_TaskToUser_B_fkey" FOREIGN KEY ("B") 
 ALTER TABLE "_TaskToTaskList" ADD CONSTRAINT "_TaskToTaskList_A_fkey" FOREIGN KEY ("A") REFERENCES "tasks"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_TaskToTaskList" ADD CONSTRAINT "_TaskToTaskList_B_fkey" FOREIGN KEY ("B") REFERENCES "TaskList"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_TaskToTaskList" ADD CONSTRAINT "_TaskToTaskList_B_fkey" FOREIGN KEY ("B") REFERENCES "taskLists"("id") ON DELETE CASCADE ON UPDATE CASCADE;
