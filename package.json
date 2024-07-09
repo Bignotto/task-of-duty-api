@@ -8,6 +8,7 @@
     "start": "node build/server.js",
     "build": "tsup src --out-dir build",
     "test:run": "vitest run",
+    "test:coverage": "vitest --coverage",
     "test": "vitest"
   },
   "author": "Thiago Bignotto",
