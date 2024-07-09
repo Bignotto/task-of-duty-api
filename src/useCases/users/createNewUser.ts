@@ -27,6 +27,6 @@ export class CreateNewUserUseCase {
       phone,
       userType,
     });
-    return user;
+    return { user };
   }
 }
