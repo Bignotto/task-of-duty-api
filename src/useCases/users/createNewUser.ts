@@ -1,7 +1,7 @@
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { User, UserType } from "@prisma/client";
 import { hash } from "bcryptjs";
-import { EmailAlreadyInUse } from "./erros/EmailAlreadyInUseError";
+import { EmailAlreadyInUse } from "./errors/EmailAlreadyInUseError";
 
 interface CreateNewUserRequest {
   name: string;

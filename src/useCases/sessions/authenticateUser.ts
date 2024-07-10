@@ -22,7 +22,7 @@ export class AuthenticateUserUseCase {
     const user = await this.usersRepository.findByEmail(email);
     if (!user) throw new InvalidCredentialsError();
 
-    const doesPasswordsMatch = await compare(password, `${user.passwordHash}`);
+    const doesPasswordsMatch = await compare(password, user.passwordHash);
 
     if (!doesPasswordsMatch) throw new InvalidCredentialsError();
 

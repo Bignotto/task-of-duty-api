@@ -1,4 +1,4 @@
-import { EmailAlreadyInUse } from "@/useCases/users/erros/EmailAlreadyInUseError";
+import { EmailAlreadyInUse } from "@/useCases/users/errors/EmailAlreadyInUseError";
 import { makeCreateNewUserUseCase } from "@/useCases/users/factories/makeCreateNewUserUseCase";
 import { UserType } from "@prisma/client";
 import { FastifyReply, FastifyRequest } from "fastify";

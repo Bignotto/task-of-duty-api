@@ -33,6 +33,7 @@ export class InMemoryUsersRepository implements IUsersRepository {
       phone: data.phone!,
       userType: data.userType!,
       partOfOrganizationId: null,
+      passwordHash: data.passwordHash,
     };
 
     this.items.push(user);
