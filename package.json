@@ -8,20 +8,23 @@
     "start": "node build/server.js",
     "build": "tsup src --out-dir build",
     "test:run": "vitest run",
-    "test:coverage": "vitest --coverage",
-    "test": "vitest"
+    "test:coverage": "vitest run --coverage",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "author": "Thiago Bignotto",
   "license": "MIT",
   "devDependencies": {
     "@rocketseat/eslint-config": "2.2.2",
     "@types/node": "20.14.10",
+    "@vitest/coverage-v8": "2.0.1",
+    "@vitest/ui": "2.0.1",
     "eslint": "8.57.0",
     "tsup": "8.1.0",
     "tsx": "4.16.2",
     "typescript": "5.5.3",
     "vite-tsconfig-paths": "4.3.2",
-    "vitest": "1.6.0"
+    "vitest": "2.0.1"
   },
   "dependencies": {
     "@prisma/client": "5.16.1",
