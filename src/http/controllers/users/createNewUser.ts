@@ -11,17 +11,24 @@ export async function createNewUser(
   const newUserBodySchema = z.object({
     name: z.string(),
     email: z.string(),
+    password: z.string().min(6),
     phone: z.string().optional(),
     userType: z.nativeEnum(UserType).optional(),
   });
 
-  const { name, email, phone, userType } = newUserBodySchema.parse(
+  const { name, email, password, phone, userType } = newUserBodySchema.parse(
     request.body,
   );
 
   try {
     const createNewUserUseCase = makeCreateNewUserUseCase();
-    await createNewUserUseCase.execute({ name, email, phone, userType });
+    await createNewUserUseCase.execute({
+      name,
+      email,
+      password,
+      phone,
+      userType,
+    });
   } catch (error) {
     if (error instanceof EmailAlreadyInUse) {
       return reply.status(409).send({ message: error.message });
