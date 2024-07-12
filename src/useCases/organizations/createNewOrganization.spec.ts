@@ -24,8 +24,8 @@ describe("Create New Organization Use Case", () => {
 
     const { organization } = await sut.execute({
       cnpj: "51049401000177",
-      fantasyName: "Planeta",
-      name: "Planeta Diário ",
+      fantasyName: "Bugle",
+      name: "Daily Bugle",
       ownerId: user.id,
     });
 
