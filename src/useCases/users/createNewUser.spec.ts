@@ -2,6 +2,7 @@ import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepo
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewUserUseCase } from "./createNewUser";
 import { EmailAlreadyInUse } from "./errors/EmailAlreadyInUseError";
+import { PasswordLengthError } from "./errors/PasswordLengthError";
 
 let usersRepository: InMemoryUsersRepository;
 let sut: CreateNewUserUseCase;
@@ -36,5 +37,15 @@ describe("Create New User Use Case", () => {
         password: "123456",
       }),
     ).rejects.toBeInstanceOf(EmailAlreadyInUse);
+  });
+
+  it("should not be able to register with a less than 6 characters password", async () => {
+    await expect(() =>
+      sut.execute({
+        name: "Mary Jane",
+        email: "mj@dailyplanet.com",
+        password: "12345",
+      }),
+    ).rejects.toBeInstanceOf(PasswordLengthError);
   });
 });

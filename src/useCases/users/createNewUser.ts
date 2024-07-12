@@ -2,6 +2,7 @@ import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { User, UserType } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { EmailAlreadyInUse } from "./errors/EmailAlreadyInUseError";
+import { PasswordLengthError } from "./errors/PasswordLengthError";
 
 interface CreateNewUserRequest {
   name: string;
@@ -30,6 +31,8 @@ export class CreateNewUserUseCase {
     if (userWithSameEmail) {
       throw new EmailAlreadyInUse();
     }
+
+    if (password.length < 6) throw new PasswordLengthError();
 
     const passwordHash = await hash(password, 6);
 
