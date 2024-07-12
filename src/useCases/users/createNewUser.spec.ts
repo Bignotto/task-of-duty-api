@@ -1,35 +1,51 @@
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewUserUseCase } from "./createNewUser";
-import { EmailAlreadyInUse } from "./erros/EmailAlreadyInUseError";
+import { EmailAlreadyInUse } from "./errors/EmailAlreadyInUseError";
+import { PasswordLengthError } from "./errors/PasswordLengthError";
+
+let usersRepository: InMemoryUsersRepository;
+let sut: CreateNewUserUseCase;
 
 describe("Create New User Use Case", () => {
-  it("should be able to create a new user", async () => {
-    const repository = new InMemoryUsersRepository();
-    const useCase = new CreateNewUserUseCase(repository);
+  beforeEach(() => {
+    usersRepository = new InMemoryUsersRepository();
+    sut = new CreateNewUserUseCase(usersRepository);
+  });
 
-    const { user } = await useCase.execute({
+  it("should be able to create a new user", async () => {
+    const { user } = await sut.execute({
       name: "Mary Jane",
       email: "mj@dailyplanet.com",
+      password: "123456",
     });
 
     expect(user.id).toEqual(expect.any(String));
   });
 
   it("should not be able to register using same email twice", async () => {
-    const repository = new InMemoryUsersRepository();
-    const useCase = new CreateNewUserUseCase(repository);
-
-    await useCase.execute({
+    await sut.execute({
       name: "Mary Jane",
       email: "mj@dailyplanet.com",
+      password: "123456",
     });
 
     await expect(() =>
-      useCase.execute({
+      sut.execute({
         name: "Mary Jane",
         email: "mj@dailyplanet.com",
+        password: "123456",
       }),
     ).rejects.toBeInstanceOf(EmailAlreadyInUse);
+  });
+
+  it("should not be able to register with a less than 6 characters password", async () => {
+    await expect(() =>
+      sut.execute({
+        name: "Mary Jane",
+        email: "mj@dailyplanet.com",
+        password: "12345",
+      }),
+    ).rejects.toBeInstanceOf(PasswordLengthError);
   });
 });
