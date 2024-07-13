@@ -3,7 +3,8 @@ import { UserInvite } from "@prisma/client";
 
 interface CreateNewInviteRequest {
   organizationId: string;
-  inviteUserId: string;
+  invitedPhone: string;
+  invitedEmail?: string;
   dueDate?: Date;
 }
 
@@ -16,7 +17,8 @@ export class CreateNewInviteUseCase {
 
   async execute({
     organizationId,
-    inviteUserId,
+    invitedPhone,
+    invitedEmail,
     dueDate,
   }: CreateNewInviteRequest): Promise<CreateNewInviteResponse> {
     const userInvite = await this.invitesRepository.create({
@@ -25,11 +27,8 @@ export class CreateNewInviteUseCase {
           id: organizationId,
         },
       },
-      user: {
-        connect: {
-          id: inviteUserId,
-        },
-      },
+      invitedPhone,
+      invitedEmail,
       dueDate,
     });
 

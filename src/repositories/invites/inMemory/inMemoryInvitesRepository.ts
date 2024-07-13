@@ -9,8 +9,9 @@ export class InMemoryInvitesRepository implements IInvitesRepository {
     const invite: UserInvite = {
       id: randomUUID(),
       organizationId: `${data.organization.connect?.id}`,
-      userId: `${data.user.connect?.id}`,
       dueDate: null,
+      invitedEmail: `${data.invitedEmail}`,
+      invitedPhone: data.invitedPhone,
       createDate: new Date(),
     };
     this.items.push(invite);
