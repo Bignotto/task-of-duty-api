@@ -1,5 +1,6 @@
 import { IInvitesRepository } from "@/repositories/invites/IInvitesRepository";
 import { UserInvite } from "@prisma/client";
+import { InvalidPhoneNumberError } from "./errors/InvalidPhoneError";
 
 interface CreateNewInviteRequest {
   organizationId: string;
@@ -21,6 +22,8 @@ export class CreateNewInviteUseCase {
     invitedEmail,
     dueDate,
   }: CreateNewInviteRequest): Promise<CreateNewInviteResponse> {
+    if (invitedPhone.length !== 11) throw new InvalidPhoneNumberError();
+
     const userInvite = await this.invitesRepository.create({
       organization: {
         connect: {
