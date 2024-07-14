@@ -58,7 +58,8 @@ model Organization {
 
   tasks Task[]
 
-  taskLists TaskList[]
+  taskLists    TaskList[]
+  invitedUsers UserInvite[] @relation(name: "organization_invite_user")
 
   @@map("organizations")
 }
@@ -100,4 +101,19 @@ model TaskList {
   creatorId String
 
   @@map("taskLists")
+}
+
+model UserInvite {
+  id String @id @default(uuid())
+
+  organization   Organization @relation(name: "organization_invite_user", fields: [organizationId], references: [id])
+  organizationId String
+
+  createDate DateTime  @default(now())
+  dueDate    DateTime?
+
+  invitedEmail String?
+  invitedPhone String
+
+  @@map("userInvites")
 }
