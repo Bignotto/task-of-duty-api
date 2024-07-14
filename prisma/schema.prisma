@@ -67,7 +67,7 @@ model Organization {
 model Task {
   id             BigInt         @id @default(autoincrement())
   title          String
-  desciption     String
+  description    String
   recurrenceType RecurrenceType
   taskType       TaskType
 
