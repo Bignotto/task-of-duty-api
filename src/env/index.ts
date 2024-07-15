@@ -16,6 +16,7 @@ const envSchema = z.object({
   DATABASE_CLIENT: z.string(),
   DATABASE_URL: z.string(),
   PORT: z.coerce.number().default(3333),
+  THE_APP_SECRET: z.string(),
 });
 
 const _env = envSchema.safeParse(process.env);
