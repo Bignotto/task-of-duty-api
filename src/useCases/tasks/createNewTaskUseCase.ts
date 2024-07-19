@@ -1,5 +1,8 @@
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
+import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { RecurrenceType, Task, TaskType } from "@prisma/client";
+import { NotFoundError } from "../taskLists/errors/NotFoundError";
+import { NotOrganizationOwnerError } from "./errors/NotOrganizationOwnerError";
 
 interface CreateNewTaskRequest {
   title: string;
@@ -8,7 +11,7 @@ interface CreateNewTaskRequest {
   taskType: TaskType;
   creatorId: string;
   dueDate?: Date;
-  organizationId?: string;
+  organizationId: string;
 }
 
 interface CreateNewTaskResponse {
@@ -16,7 +19,10 @@ interface CreateNewTaskResponse {
 }
 
 export class CreateNewTaskUseCase {
-  constructor(private tasksRepository: ITasksRepository) {}
+  constructor(
+    private tasksRepository: ITasksRepository,
+    private usersRepository: IUsersRepository,
+  ) {}
 
   async execute({
     title,
@@ -27,6 +33,18 @@ export class CreateNewTaskUseCase {
     dueDate,
     organizationId,
   }: CreateNewTaskRequest): Promise<CreateNewTaskResponse> {
+    const creator = await this.usersRepository.findById(creatorId);
+    if (!creator)
+      throw new NotFoundError({
+        origin: "CreateNewTaskUseCase",
+        sub: creatorId,
+      });
+
+    if (creator.userType !== "ORGANIZATION")
+      throw new NotOrganizationOwnerError({
+        origin: "CreateNewTaskUseCase",
+      });
+
     const task = await this.tasksRepository.create({
       title,
       description,
