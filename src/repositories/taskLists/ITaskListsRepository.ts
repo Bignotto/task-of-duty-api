@@ -1,7 +1,9 @@
-import { Prisma, TaskList } from "@prisma/client";
+import { Prisma, Task, TaskList } from "@prisma/client";
 
 export interface ITaskListsRepository {
   create(data: Prisma.TaskListCreateInput): Promise<TaskList>;
-  addTask(taskId: bigint, taskListId: bigint): Promise<TaskList | null>;
-  getTaskListById(taskId: bigint): Promise<TaskList | null>;
+  addTaskToList(taskId: bigint, taskListId: bigint): Promise<TaskList | null>;
+
+  findTaskListById(taskListId: bigint): Promise<TaskList | null>;
+  getTaskListTasksById(taskListId: bigint): Promise<Task[] | null>;
 }

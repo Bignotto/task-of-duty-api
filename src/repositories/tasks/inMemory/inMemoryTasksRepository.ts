@@ -23,4 +23,10 @@ export class InMemoryTasksRepository implements ITasksRepository {
     this.items.push(task);
     return task;
   }
+
+  async findById(taskId: bigint) {
+    const task = this.items.find((task) => task.id === taskId);
+    if (!task) return null;
+    return task;
+  }
 }

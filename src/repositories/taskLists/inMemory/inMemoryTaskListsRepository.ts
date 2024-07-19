@@ -1,10 +1,15 @@
-import { Prisma, TaskList } from "@prisma/client";
+import {
+  Prisma,
+  RecurrenceType,
+  Task,
+  TaskList,
+  TaskType,
+} from "@prisma/client";
 import { ITaskListsRepository } from "../ITaskListsRepository";
 
 export class InMemoryTaskListsRepository implements ITaskListsRepository {
   private lists: TaskList[] = [];
-
-  private tasks: bigint[] = [];
+  private tasks: Task[] = [];
 
   private list_have_tasks: {
     listId: bigint;
@@ -25,11 +30,22 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
     return newTaskList;
   }
 
-  async addTask(taskId: bigint, taskListId: bigint) {
+  async addTaskToList(taskId: bigint, taskListId: bigint) {
     const i = this.lists.findIndex((item) => item.id === taskListId);
     if (i < 0) return null;
 
-    this.tasks.push(taskId);
+    this.tasks.push({
+      createDate: new Date(),
+      creatorId: "some user id",
+      description: "some description",
+      title: "some title",
+      dueDate: new Date(),
+      id: BigInt(taskId),
+      organizationId: "some or id",
+      recurrenceType: RecurrenceType.EXACT,
+      taskType: TaskType.TASK,
+    });
+
     this.list_have_tasks.push({
       listId: taskListId,
       taskId,
@@ -38,9 +54,20 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
     return this.lists[i];
   }
 
-  async getTaskListById(taskId: bigint) {
-    const list = this.lists.find((i) => i.id === taskId);
+  async findTaskListById(taskListId: bigint) {
+    const list = this.lists.find((i) => i.id === taskListId);
     if (!list) return null;
     return list;
+  }
+
+  async getTaskListTasksById(taskListId: bigint) {
+    const listTasksIds = this.list_have_tasks.filter(
+      (l) => (l.listId = taskListId),
+    );
+    const tasks = this.tasks.filter((t) =>
+      listTasksIds.find((l) => l.taskId === t.id),
+    );
+
+    return tasks;
   }
 }
