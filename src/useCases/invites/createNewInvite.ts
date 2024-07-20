@@ -1,6 +1,7 @@
 import { IInvitesRepository } from "@/repositories/invites/IInvitesRepository";
 import { UserInvite } from "@prisma/client";
-import { addDays } from "date-fns";
+import { addDays, isBefore } from "date-fns";
+import { InvalidDateError } from "./errors/InvalidDateError";
 import { InvalidPhoneNumberError } from "./errors/InvalidPhoneError";
 
 interface CreateNewInviteRequest {
@@ -23,7 +24,10 @@ export class CreateNewInviteUseCase {
     invitedEmail,
     dueDate,
   }: CreateNewInviteRequest): Promise<CreateNewInviteResponse> {
-    if (invitedPhone.length !== 11) throw new InvalidPhoneNumberError();
+    const cleanedPhone = invitedPhone.replace(/[^0-9]/g, "");
+    if (cleanedPhone.length !== 11) throw new InvalidPhoneNumberError();
+
+    if (dueDate && isBefore(dueDate, new Date())) throw new InvalidDateError();
 
     const userInvite = await this.invitesRepository.create({
       organization: {
@@ -31,7 +35,7 @@ export class CreateNewInviteUseCase {
           id: organizationId,
         },
       },
-      invitedPhone,
+      invitedPhone: `${cleanedPhone}`,
       invitedEmail,
       dueDate: dueDate ? dueDate : addDays(new Date(), 3),
     });

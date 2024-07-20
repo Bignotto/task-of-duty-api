@@ -2,8 +2,10 @@ import { InMemoryInvitesRepository } from "@/repositories/invites/inMemory/inMem
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
 import { Organization, User } from "@prisma/client";
+import { subDays } from "date-fns";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewInviteUseCase } from "./createNewInvite";
+import { InvalidDateError } from "./errors/InvalidDateError";
 import { InvalidPhoneNumberError } from "./errors/InvalidPhoneError";
 
 let invitesRepository: InMemoryInvitesRepository;
@@ -43,7 +45,7 @@ describe("Invite User Use Case", () => {
   it("organizations owner should be able to invite users", async () => {
     const { userInvite } = await sut.execute({
       organizationId: organization.id,
-      invitedPhone: "12345678901",
+      invitedPhone: "(12)34567-8901",
     });
 
     expect(userInvite.id).toEqual(expect.any(String));
@@ -53,8 +55,18 @@ describe("Invite User Use Case", () => {
     await expect(() =>
       sut.execute({
         organizationId: organization.id,
-        invitedPhone: "12345678",
+        invitedPhone: "invalid phone number",
       }),
     ).rejects.toBeInstanceOf(InvalidPhoneNumberError);
+  });
+
+  it("should not be able to create an invite with invalid date", async () => {
+    await expect(() =>
+      sut.execute({
+        organizationId: organization.id,
+        invitedPhone: "(12)34567-8901",
+        dueDate: subDays(new Date(), 1), //yesterday
+      }),
+    ).rejects.toBeInstanceOf(InvalidDateError);
   });
 });
