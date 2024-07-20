@@ -8,6 +8,7 @@ import { CreateNewUserUseCase } from "./createNewUser";
 import { EmailAlreadyInUseError } from "./errors/EmailAlreadyInUseError";
 import { ExpiredInviteError } from "./errors/ExpiredInviteError";
 import { InvalidInviteError } from "./errors/InvalidInviteError";
+import { InvalidPhoneNumberError } from "./errors/InvalidPhoneNumberError";
 import { PasswordLengthError } from "./errors/PasswordLengthError";
 
 let usersRepository: InMemoryUsersRepository;
@@ -29,6 +30,7 @@ describe("Create New User Use Case", () => {
       name: "Mary Jane",
       email: "mj@dailyplanet.com",
       password: "123456",
+      phone: "(19)93646-4678",
     });
 
     expect(user.id).toEqual(expect.any(String));
@@ -137,5 +139,16 @@ describe("Create New User Use Case", () => {
         password: "12345",
       }),
     ).rejects.toBeInstanceOf(PasswordLengthError);
+  });
+
+  it("should not be able to register with invalid phone number", async () => {
+    await expect(() =>
+      sut.execute({
+        name: "Mary Jane",
+        email: "mj@dailyplanet.com",
+        password: "123456",
+        phone: "invalid phone number",
+      }),
+    ).rejects.toBeInstanceOf(InvalidPhoneNumberError);
   });
 });

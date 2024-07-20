@@ -6,6 +6,7 @@ import { isBefore } from "date-fns";
 import { EmailAlreadyInUseError } from "./errors/EmailAlreadyInUseError";
 import { ExpiredInviteError } from "./errors/ExpiredInviteError";
 import { InvalidInviteError } from "./errors/InvalidInviteError";
+import { InvalidPhoneNumberError } from "./errors/InvalidPhoneNumberError";
 import { PasswordLengthError } from "./errors/PasswordLengthError";
 
 interface CreateNewUserRequest {
@@ -13,7 +14,6 @@ interface CreateNewUserRequest {
   email: string;
   password: string;
   phone?: string;
-  userType?: UserType;
   inviteId?: string;
 }
 
@@ -32,18 +32,8 @@ export class CreateNewUserUseCase {
     email,
     password,
     phone,
-    userType,
     inviteId,
   }: CreateNewUserRequest): Promise<CreateNewUserResponse> {
-    const userWithSameEmail = await this.usersRepository.findByEmail(email);
-    if (userWithSameEmail) {
-      throw new EmailAlreadyInUseError();
-    }
-
-    if (password.length < 6) throw new PasswordLengthError();
-
-    const passwordHash = await hash(password, 6);
-
     let invite;
     if (inviteId) {
       invite = await this.invitesRepository.findById(`${inviteId}`);
@@ -52,11 +42,26 @@ export class CreateNewUserUseCase {
         throw new ExpiredInviteError();
     }
 
+    const userWithSameEmail = await this.usersRepository.findByEmail(email);
+    if (userWithSameEmail) {
+      throw new EmailAlreadyInUseError();
+    }
+
+    if (password.length < 6) throw new PasswordLengthError();
+    const passwordHash = await hash(password, 6);
+
+    let cleanedPhone = null;
+    if (phone) {
+      // cleanedPhone = phone.match(/(\d+)/g);
+      cleanedPhone = phone.replace(/[^0-9]/g, "");
+      if (cleanedPhone.length !== 11) throw new InvalidPhoneNumberError();
+    }
+
     const user = await this.usersRepository.create({
       name,
       email,
       passwordHash,
-      phone,
+      phone: cleanedPhone,
       userType: inviteId ? UserType.USER : UserType.ORGANIZATION,
     });
     return { user };
