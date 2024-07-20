@@ -1,5 +1,6 @@
 import { IInvitesRepository } from "@/repositories/invites/IInvitesRepository";
 import { UserInvite } from "@prisma/client";
+import { addDays } from "date-fns";
 import { InvalidPhoneNumberError } from "./errors/InvalidPhoneError";
 
 interface CreateNewInviteRequest {
@@ -32,7 +33,7 @@ export class CreateNewInviteUseCase {
       },
       invitedPhone,
       invitedEmail,
-      dueDate,
+      dueDate: dueDate ? dueDate : addDays(new Date(), 3),
     });
 
     return { userInvite };

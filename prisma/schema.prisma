@@ -27,6 +27,12 @@ enum RecurrenceType {
   ANNUALLY
 }
 
+enum InviteStatus {
+  CLOSED
+  OPEN
+  EXPIRED
+}
+
 model User {
   id               String        @id @default(uuid())
   name             String
@@ -76,8 +82,8 @@ model Task {
 
   assignees User[]
 
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  organizationId String?
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
 
   creator   User   @relation(name: "task_creator", fields: [creatorId], references: [id])
   creatorId String
@@ -114,6 +120,8 @@ model UserInvite {
 
   invitedEmail String?
   invitedPhone String
+
+  status InviteStatus @default(OPEN)
 
   @@map("userInvites")
 }

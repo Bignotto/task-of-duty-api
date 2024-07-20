@@ -2,9 +2,11 @@ import { InMemoryInvitesRepository } from "@/repositories/invites/inMemory/inMem
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
 import { Organization, UserType } from "@prisma/client";
+import { subDays } from "date-fns";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewUserUseCase } from "./createNewUser";
 import { EmailAlreadyInUseError } from "./errors/EmailAlreadyInUseError";
+import { ExpiredInviteError } from "./errors/ExpiredInviteError";
 import { InvalidInviteError } from "./errors/InvalidInviteError";
 import { PasswordLengthError } from "./errors/PasswordLengthError";
 
@@ -89,6 +91,26 @@ describe("Create New User Use Case", () => {
         inviteId: "some invalid invite id",
       }),
     ).rejects.toBeInstanceOf(InvalidInviteError);
+  });
+
+  it("should not be able to register using an expired invite", async () => {
+    const invite = await invitesRepository.create({
+      invitedPhone: "99999999999",
+      dueDate: subDays(new Date(), 1),
+      organization: {
+        connect: {
+          id: organization.id,
+        },
+      },
+    });
+    await expect(() =>
+      sut.execute({
+        name: "Mary Jane",
+        email: "mj@dailyplanet.com",
+        password: "123456",
+        inviteId: invite.id,
+      }),
+    ).rejects.toBeInstanceOf(ExpiredInviteError);
   });
 
   it("should not be able to register using same email twice", async () => {

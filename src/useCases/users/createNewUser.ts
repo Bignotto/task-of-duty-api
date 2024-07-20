@@ -2,7 +2,9 @@ import { IInvitesRepository } from "@/repositories/invites/IInvitesRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { User, UserType } from "@prisma/client";
 import { hash } from "bcryptjs";
+import { isBefore } from "date-fns";
 import { EmailAlreadyInUseError } from "./errors/EmailAlreadyInUseError";
+import { ExpiredInviteError } from "./errors/ExpiredInviteError";
 import { InvalidInviteError } from "./errors/InvalidInviteError";
 import { PasswordLengthError } from "./errors/PasswordLengthError";
 
@@ -46,6 +48,8 @@ export class CreateNewUserUseCase {
     if (inviteId) {
       invite = await this.invitesRepository.findById(`${inviteId}`);
       if (!invite) throw new InvalidInviteError();
+      if (invite.dueDate && isBefore(invite.dueDate, new Date()))
+        throw new ExpiredInviteError();
     }
 
     const user = await this.usersRepository.create({
