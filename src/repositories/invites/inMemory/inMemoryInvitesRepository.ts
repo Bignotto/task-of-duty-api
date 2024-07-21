@@ -1,4 +1,5 @@
-import { Prisma, UserInvite } from "@prisma/client";
+import { InviteStatus, Prisma, UserInvite } from "@prisma/client";
+import { addDays } from "date-fns";
 import { randomUUID } from "node:crypto";
 import { IInvitesRepository } from "../IInvitesRepository";
 
@@ -9,10 +10,11 @@ export class InMemoryInvitesRepository implements IInvitesRepository {
     const invite: UserInvite = {
       id: randomUUID(),
       organizationId: `${data.organization.connect?.id}`,
-      dueDate: null,
+      dueDate: data.dueDate ? new Date(data.dueDate) : addDays(new Date(), 3),
       invitedEmail: `${data.invitedEmail}`,
       invitedPhone: data.invitedPhone,
       createDate: new Date(),
+      status: InviteStatus.OPEN,
     };
     this.items.push(invite);
 
