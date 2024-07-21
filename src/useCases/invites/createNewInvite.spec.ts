@@ -1,12 +1,13 @@
 import { InMemoryInvitesRepository } from "@/repositories/invites/inMemory/inMemoryInvitesRepository";
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
-import { Organization, User } from "@prisma/client";
+import { Organization, User, UserType } from "@prisma/client";
 import { subDays } from "date-fns";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewInviteUseCase } from "./createNewInvite";
 import { InvalidDateError } from "./errors/InvalidDateError";
 import { InvalidPhoneNumberError } from "./errors/InvalidPhoneError";
+import { NotOrganizationAdminError } from "./errors/NotOrganizationAdmin";
 
 let invitesRepository: InMemoryInvitesRepository;
 let usersRepository: InMemoryUsersRepository;
@@ -19,15 +20,16 @@ let sut: CreateNewInviteUseCase;
 describe("Invite User Use Case", () => {
   beforeEach(async () => {
     invitesRepository = new InMemoryInvitesRepository();
-    sut = new CreateNewInviteUseCase(invitesRepository);
-
     usersRepository = new InMemoryUsersRepository();
+    sut = new CreateNewInviteUseCase(invitesRepository, usersRepository);
+
     organizationsRepository = new InMemoryOrganizationsRepository();
 
     user = await usersRepository.create({
       email: "mj@dailybuggle.com",
       name: "Mary Jane",
       passwordHash: "hashed_password",
+      userType: UserType.ORGANIZATION,
     });
 
     organization = await organizationsRepository.create({
@@ -46,6 +48,7 @@ describe("Invite User Use Case", () => {
     const { userInvite } = await sut.execute({
       organizationId: organization.id,
       invitedPhone: "(12)34567-8901",
+      creatorId: user.id,
     });
 
     expect(userInvite.id).toEqual(expect.any(String));
@@ -56,6 +59,7 @@ describe("Invite User Use Case", () => {
       sut.execute({
         organizationId: organization.id,
         invitedPhone: "invalid phone number",
+        creatorId: user.id,
       }),
     ).rejects.toBeInstanceOf(InvalidPhoneNumberError);
   });
@@ -66,7 +70,25 @@ describe("Invite User Use Case", () => {
         organizationId: organization.id,
         invitedPhone: "(12)34567-8901",
         dueDate: subDays(new Date(), 1), //yesterday
+        creatorId: user.id,
       }),
     ).rejects.toBeInstanceOf(InvalidDateError);
+  });
+
+  it("should not be able to create an invite with USER type users", async () => {
+    const userTypeUser = await usersRepository.create({
+      email: "jjj@dailybuggle.com",
+      name: "J Jonah Jameson",
+      passwordHash: "hashed_password",
+      userType: UserType.USER,
+    });
+
+    await expect(() =>
+      sut.execute({
+        organizationId: organization.id,
+        invitedPhone: "(12)34567-8901",
+        creatorId: userTypeUser.id,
+      }),
+    ).rejects.toBeInstanceOf(NotOrganizationAdminError);
   });
 });

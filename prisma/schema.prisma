@@ -46,8 +46,9 @@ model User {
   partOfOrganizationId String?
 
   tasksAssigned    Task[]
-  tasksCreated     Task[]     @relation(name: "task_creator")
-  taskListsCreated TaskList[] @relation(name: "task_list_creator")
+  tasksCreated     Task[]       @relation(name: "task_creator")
+  taskListsCreated TaskList[]   @relation(name: "task_list_creator")
+  userInvites      UserInvite[] @relation(name: "creator_invite")
 
   @@map("users")
 }
@@ -114,6 +115,9 @@ model UserInvite {
 
   organization   Organization @relation(name: "organization_invite_user", fields: [organizationId], references: [id])
   organizationId String
+
+  creator   User   @relation(name: "creator_invite", fields: [creatorId], references: [id])
+  creatorId String
 
   createDate DateTime  @default(now())
   dueDate    DateTime?
