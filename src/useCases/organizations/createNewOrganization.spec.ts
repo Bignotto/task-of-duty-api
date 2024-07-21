@@ -1,5 +1,6 @@
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
+import { UserType } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewOrganizationUseCase } from "./createNewOrganization";
@@ -14,7 +15,10 @@ describe("Create New Organization Use Case", () => {
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository();
     organizationsRepository = new InMemoryOrganizationsRepository();
-    sut = new CreateNewOrganizationUseCase(organizationsRepository);
+    sut = new CreateNewOrganizationUseCase(
+      organizationsRepository,
+      usersRepository,
+    );
   });
 
   it("should be able to create a new organization", async () => {
@@ -82,5 +86,23 @@ describe("Create New Organization Use Case", () => {
         ownerId: user.id,
       }),
     ).rejects.toBeInstanceOf(CnpjLengthError);
+  });
+
+  it("should update user type when registering a new organization as the owner", async () => {
+    const user = await usersRepository.create({
+      name: "Mary Jane",
+      email: "mj@dailyplanet.com",
+      passwordHash: await hash("123456", 6),
+    });
+
+    await sut.execute({
+      cnpj: "51049401000177",
+      fantasyName: "Bugle",
+      name: "Daily Bugle",
+      ownerId: user.id,
+    });
+
+    const updatedUser = await usersRepository.findById(user.id);
+    expect(updatedUser?.userType).toEqual(UserType.ORGANIZATION);
   });
 });

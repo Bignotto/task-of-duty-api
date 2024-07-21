@@ -1,5 +1,6 @@
 import { IOrganizationsRepository } from "@/repositories/organizations/IOrganizationsRepository";
-import { Organization } from "@prisma/client";
+import { IUsersRepository } from "@/repositories/users/IUsersRepository";
+import { Organization, UserType } from "@prisma/client";
 import { CnpjAlreadyInUseError } from "./errors/CnpjAlreadyInUseError";
 import { CnpjLengthError } from "./errors/CnpjLengthError";
 
@@ -15,7 +16,10 @@ interface CreateNewOrganizationResponse {
 }
 
 export class CreateNewOrganizationUseCase {
-  constructor(private organizationsRepository: IOrganizationsRepository) {}
+  constructor(
+    private organizationsRepository: IOrganizationsRepository,
+    private usersRepository: IUsersRepository,
+  ) {}
 
   async execute({
     name,
@@ -39,6 +43,8 @@ export class CreateNewOrganizationUseCase {
         },
       },
     });
+
+    await this.usersRepository.setUserType(ownerId, UserType.ORGANIZATION);
 
     return { organization };
   }
