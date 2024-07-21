@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { Prisma, User, UserType } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import { IUsersRepository } from "../IUsersRepository";
 
@@ -39,5 +39,10 @@ export class InMemoryUsersRepository implements IUsersRepository {
     this.items.push(user);
 
     return user;
+  }
+
+  async setUserType(userId: string, userType: UserType) {
+    const userIndex = this.items.findIndex((item) => item.id === userId);
+    this.items[userIndex].userType = userType;
   }
 }
