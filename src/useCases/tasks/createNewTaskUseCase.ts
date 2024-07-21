@@ -1,6 +1,6 @@
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
-import { RecurrenceType, Task, TaskType } from "@prisma/client";
+import { RecurrenceType, Task, TaskType, UserType } from "@prisma/client";
 import { NotFoundError } from "../taskLists/errors/NotFoundError";
 import { NotOrganizationOwnerError } from "./errors/NotOrganizationOwnerError";
 
@@ -40,7 +40,7 @@ export class CreateNewTaskUseCase {
         sub: creatorId,
       });
 
-    if (creator.userType !== "ORGANIZATION")
+    if (creator.userType !== UserType.ORGANIZATION)
       throw new NotOrganizationOwnerError({
         origin: "CreateNewTaskUseCase",
       });
