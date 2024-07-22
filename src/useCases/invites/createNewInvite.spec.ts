@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewInviteUseCase } from "./createNewInvite";
 import { InvalidDateError } from "./errors/InvalidDateError";
 import { InvalidPhoneNumberError } from "./errors/InvalidPhoneError";
+import { NotFoundError } from "./errors/NotFoundError";
 import { NotOrganizationAdminError } from "./errors/NotOrganizationAdmin";
 
 let invitesRepository: InMemoryInvitesRepository;
@@ -90,5 +91,16 @@ describe("Invite User Use Case", () => {
         creatorId: userTypeUser.id,
       }),
     ).rejects.toBeInstanceOf(NotOrganizationAdminError);
+  });
+
+  it("should not be able to create an invite with invalid creator id", async () => {
+    await expect(() =>
+      sut.execute({
+        organizationId: organization.id,
+        invitedPhone: "(12)34567-8901",
+        dueDate: subDays(new Date(), 1), //yesterday
+        creatorId: "some invalid id",
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });

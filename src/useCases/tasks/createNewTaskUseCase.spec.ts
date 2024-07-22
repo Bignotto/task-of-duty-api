@@ -11,6 +11,7 @@ import {
 import { randomUUID } from "crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewTaskUseCase } from "./createNewTaskUseCase";
+import { NotFoundError } from "./errors/NotFoundError";
 import { NotOrganizationOwnerError } from "./errors/NotOrganizationOwnerError";
 
 let tasksRepository: InMemoryTasksRepository;
@@ -80,5 +81,18 @@ describe("Create New Task Use Case", () => {
         organizationId: organization.id,
       }),
     ).rejects.toBeInstanceOf(NotOrganizationOwnerError);
+  });
+
+  it("should not be able to create new task with invalid creator id", async () => {
+    await expect(
+      sut.execute({
+        creatorId: "some invalid id",
+        description: "Get a good news to get a first page!",
+        title: "Find a story",
+        recurrenceType: RecurrenceType.WEEKLY,
+        taskType: TaskType.TASK,
+        organizationId: organization.id,
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });
