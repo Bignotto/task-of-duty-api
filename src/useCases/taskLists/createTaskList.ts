@@ -1,5 +1,8 @@
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
-import { TaskList } from "@prisma/client";
+import { IUsersRepository } from "@/repositories/users/IUsersRepository";
+import { TaskList, UserType } from "@prisma/client";
+import { NotFoundError } from "./errors/NotFoundError";
+import { NotOrganizationAdminError } from "./errors/NotOrganizationAdminError";
 
 interface CreateTaskListUseCaseRequest {
   title: string;
@@ -13,7 +16,10 @@ interface CreateTaskListUseCaseResponse {
 }
 
 export class CreateTaskListUseCase {
-  constructor(private taskListsRepository: ITaskListsRepository) {}
+  constructor(
+    private taskListsRepository: ITaskListsRepository,
+    private usersRepository: IUsersRepository,
+  ) {}
 
   async execute({
     title,
@@ -21,6 +27,15 @@ export class CreateTaskListUseCase {
     creatorId,
     organizationId,
   }: CreateTaskListUseCaseRequest): Promise<CreateTaskListUseCaseResponse> {
+    const user = await this.usersRepository.findById(creatorId);
+    if (!user)
+      throw new NotFoundError({
+        origin: "CreateTaskListUseCase",
+        sub: creatorId,
+      });
+    if (user.userType !== UserType.ORGANIZATION)
+      throw new NotOrganizationAdminError();
+
     const list = await this.taskListsRepository.create({
       title,
       description,
