@@ -27,4 +27,12 @@ export class InMemoryOrganizationsRepository
 
     return organization;
   }
+
+  async findById(organizationId: string) {
+    const organization = this.items.find((item) => item.id === organizationId);
+
+    if (!organization) return null;
+
+    return organization;
+  }
 }
