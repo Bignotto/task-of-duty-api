@@ -47,15 +47,12 @@ export class CreateTaskListUseCase {
       });
 
     if (organization.ownerId !== user.id) throw new NotOrganizationAdminError();
-    console.log({ organization, user });
 
     const list = await this.taskListsRepository.create({
       title,
       description,
       creator: { connect: { id: creatorId } },
-      organization: organizationId
-        ? { connect: { id: organizationId } }
-        : undefined,
+      organization: { connect: { id: organizationId } },
     });
 
     return { list };
