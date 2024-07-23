@@ -1,6 +1,8 @@
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
+import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { NotFoundError } from "./errors/NotFoundError";
+import { WrongOrganizationError } from "./errors/WrongOrganizationError";
 
 interface AddTaskToListRequest {
   taskListId: bigint;
@@ -11,6 +13,7 @@ export class AddTaskToListUseCase {
   constructor(
     private taskListsRepository: ITaskListsRepository,
     private tasksRepository: ITasksRepository,
+    private usersRepository: IUsersRepository,
   ) {}
 
   async execute({ taskListId, taskId }: AddTaskToListRequest) {
@@ -28,6 +31,9 @@ export class AddTaskToListUseCase {
         origin: "AddTaskToListUseCase",
         sub: `taskListId:${taskListId}`,
       });
+
+    if (task.organizationId !== taskList.organizationId)
+      throw new WrongOrganizationError();
 
     const result = await this.taskListsRepository.addTaskToList(
       taskId,
