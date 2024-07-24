@@ -12,6 +12,13 @@ app.register(fastifyCookie);
 
 app.register(fastifyJwt, {
   secret: env.THE_APP_SECRET,
+  cookie: {
+    cookieName: "refreshToken",
+    signed: false,
+  },
+  sign: {
+    expiresIn: "10m",
+  },
 });
 
 app.register(usersRoutes);
