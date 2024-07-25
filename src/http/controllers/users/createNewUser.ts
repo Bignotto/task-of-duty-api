@@ -39,3 +39,5 @@ export async function createNewUser(
 
   return reply.status(201).send();
 }
+
+//TODO: fix errors in this file

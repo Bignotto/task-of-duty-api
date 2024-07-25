@@ -1,3 +1,4 @@
+import fastifyCookie from "@fastify/cookie";
 import fastifyJwt from "@fastify/jwt";
 import { fastify } from "fastify";
 import { ZodError } from "zod";
@@ -7,8 +8,17 @@ import { usersRoutes } from "./http/controllers/users/routes";
 
 export const app = fastify();
 
+app.register(fastifyCookie);
+
 app.register(fastifyJwt, {
   secret: env.THE_APP_SECRET,
+  cookie: {
+    cookieName: "refreshToken",
+    signed: false,
+  },
+  sign: {
+    expiresIn: "10m",
+  },
 });
 
 app.register(usersRoutes);
@@ -26,7 +36,6 @@ app.setErrorHandler((error, _, reply) => {
   } else {
     //TODO: log unknown error
   }
-  console.log({ error });
 
   return reply.status(500).send({ message: "Fodeu..." });
 });

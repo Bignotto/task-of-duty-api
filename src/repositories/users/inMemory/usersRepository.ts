@@ -32,7 +32,7 @@ export class InMemoryUsersRepository implements IUsersRepository {
       name: data.name,
       phone: data.phone!,
       userType: data.userType!,
-      partOfOrganizationId: null,
+      partOfOrganizationId: `${data.partOfOrganization?.connect?.id}`,
       passwordHash: data.passwordHash,
     };
 
