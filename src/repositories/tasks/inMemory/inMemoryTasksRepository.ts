@@ -3,6 +3,11 @@ import { ITasksRepository } from "../ITasksRepository";
 
 export class InMemoryTasksRepository implements ITasksRepository {
   public items: Task[] = [];
+  public usersAssignedTasks: {
+    taskIndex: number;
+    userId: string;
+  }[] = [];
+
   async create(data: Prisma.TaskCreateInput) {
     const tomorrow = new Date();
     const duoDate = new Date(`${data.dueDate}`);
@@ -28,5 +33,17 @@ export class InMemoryTasksRepository implements ITasksRepository {
     const task = this.items.find((task) => task.id === taskId);
     if (!task) return null;
     return task;
+  }
+
+  async assignUser(taskId: bigint, assigneeId: string) {
+    const index = this.items.findIndex((item) => item.id === taskId);
+    if (index < 0) return false;
+
+    this.usersAssignedTasks.push({
+      taskIndex: index,
+      userId: assigneeId,
+    });
+
+    return true;
   }
 }
