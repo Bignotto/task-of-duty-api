@@ -36,7 +36,6 @@ app.setErrorHandler((error, _, reply) => {
   } else {
     //TODO: log unknown error
   }
-  console.log({ error });
 
   return reply.status(500).send({ message: "Fodeu..." });
 });
