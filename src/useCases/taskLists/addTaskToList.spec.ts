@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryTaskListsRepository } from "@/repositories/taskLists/inMemory/inMemoryTaskListsRepository";
 import { InMemoryTasksRepository } from "@/repositories/tasks/inMemory/inMemoryTasksRepository";
@@ -12,7 +13,6 @@ import {
 } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { AddTaskToListUseCase } from "./addTaskToList";
-import { NotFoundError } from "./errors/NotFoundError";
 import { WrongOrganizationError } from "./errors/WrongOrganizationError";
 
 let usersRepository: InMemoryUsersRepository;

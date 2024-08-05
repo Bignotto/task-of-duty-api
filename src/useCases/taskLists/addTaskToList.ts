@@ -1,7 +1,7 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
-import { NotFoundError } from "./errors/NotFoundError";
 import { WrongOrganizationError } from "./errors/WrongOrganizationError";
 
 interface AddTaskToListRequest {

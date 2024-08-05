@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryTasksRepository } from "@/repositories/tasks/inMemory/inMemoryTasksRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
@@ -11,7 +12,6 @@ import {
 import { randomUUID } from "crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateNewTaskUseCase } from "./createNewTaskUseCase";
-import { NotFoundError } from "./errors/NotFoundError";
 import { NotOrganizationOwnerError } from "./errors/NotOrganizationOwnerError";
 
 let tasksRepository: InMemoryTasksRepository;

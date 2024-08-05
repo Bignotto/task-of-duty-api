@@ -1,7 +1,7 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { RecurrenceType, Task, TaskType, UserType } from "@prisma/client";
-import { NotFoundError } from "./errors/NotFoundError";
 import { NotOrganizationOwnerError } from "./errors/NotOrganizationOwnerError";
 
 interface CreateNewTaskRequest {
