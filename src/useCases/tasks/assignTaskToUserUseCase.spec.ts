@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationError";
 import { InMemoryTasksRepository } from "@/repositories/tasks/inMemory/inMemoryTasksRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
@@ -18,7 +19,7 @@ let task3: Task;
 
 let sut: AssignTaskToUserUseCase;
 
-describe("Assing Tasks to Users Use Case", () => {
+describe("Assign Tasks to Users Use Case", () => {
   beforeEach(async () => {
     usersRepository = new InMemoryUsersRepository();
     tasksRepository = new InMemoryTasksRepository();
@@ -107,7 +108,7 @@ describe("Assing Tasks to Users Use Case", () => {
     });
   });
 
-  it("should be able to assing user a task", async () => {
+  it("should be able to assign user a task", async () => {
     const { result } = await sut.execute({
       assigneeId: userA.id,
       taskId: task1.id,
@@ -140,5 +141,38 @@ describe("Assing Tasks to Users Use Case", () => {
         taskId: otherOrganizationTask.id,
       }),
     ).rejects.toBeInstanceOf(NotSameOrganizationError);
+  });
+
+  it("should be possible to assign more than one user to a task", async () => {
+    const { result: resultA } = await sut.execute({
+      assigneeId: userA.id,
+      taskId: task1.id,
+    });
+
+    const { result: resultB } = await sut.execute({
+      assigneeId: userB.id,
+      taskId: task1.id,
+    });
+
+    expect(resultA).toBe(true);
+    expect(resultB).toBe(true);
+  });
+
+  it("should not be possible to assign invalid user a task", async () => {
+    await expect(
+      sut.execute({
+        assigneeId: "invalid user",
+        taskId: task1.id,
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("should not be possible to assign user an invalid task", async () => {
+    await expect(
+      sut.execute({
+        assigneeId: userA.id,
+        taskId: BigInt(55),
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 }); //describe
