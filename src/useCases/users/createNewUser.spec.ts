@@ -66,6 +66,11 @@ describe("Create New User Use Case", () => {
     });
 
     const invite = await invitesRepository.create({
+      creator: {
+        connect: {
+          id: user.id,
+        },
+      },
       invitedPhone: "99999999999",
       organization: {
         connect: {
@@ -97,6 +102,11 @@ describe("Create New User Use Case", () => {
 
   it("should not be able to register using an expired invite", async () => {
     const invite = await invitesRepository.create({
+      creator: {
+        connect: {
+          id: "user.id",
+        },
+      },
       invitedPhone: "99999999999",
       dueDate: subDays(new Date(), 1),
       organization: {
