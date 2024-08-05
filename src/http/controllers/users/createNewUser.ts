@@ -1,4 +1,4 @@
-import { EmailAlreadyInUse } from "@/useCases/users/errors/EmailAlreadyInUseError";
+import { EmailAlreadyInUseError } from "@/useCases/users/errors/EmailAlreadyInUseError";
 import { makeCreateNewUserUseCase } from "@/useCases/users/factories/makeCreateNewUserUseCase";
 import { UserType } from "@prisma/client";
 import { FastifyReply, FastifyRequest } from "fastify";
@@ -27,10 +27,9 @@ export async function createNewUser(
       email,
       password,
       phone,
-      userType,
     });
   } catch (error) {
-    if (error instanceof EmailAlreadyInUse) {
+    if (error instanceof EmailAlreadyInUseError) {
       return reply.status(409).send({ message: error.message });
     }
 
