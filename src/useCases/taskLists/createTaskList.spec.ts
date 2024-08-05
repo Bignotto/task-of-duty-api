@@ -1,10 +1,10 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryTaskListsRepository } from "@/repositories/taskLists/inMemory/inMemoryTaskListsRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
 import { Organization, User, UserType } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CreateTaskListUseCase } from "./createTaskList";
-import { NotFoundError } from "./errors/NotFoundError";
 import { NotOrganizationAdminError } from "./errors/NotOrganizationAdminError";
 
 let user: User;

@@ -1,8 +1,8 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { IOrganizationsRepository } from "@/repositories/organizations/IOrganizationsRepository";
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { TaskList, UserType } from "@prisma/client";
-import { NotFoundError } from "./errors/NotFoundError";
 import { NotOrganizationAdminError } from "./errors/NotOrganizationAdminError";
 
 interface CreateTaskListUseCaseRequest {
