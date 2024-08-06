@@ -3,6 +3,51 @@ import { Prisma } from "@prisma/client";
 import { ITaskListsRepository } from "../ITaskListsRepository";
 
 export class PrismaTaskListsRepository implements ITaskListsRepository {
+  async addTaskToList(taskId: bigint, taskListId: bigint) {
+    const result = await prisma.taskList.update({
+      where: {
+        id: taskListId,
+      },
+      data: {
+        tasks: {
+          connect: {
+            id: taskId,
+          },
+        },
+      },
+    });
+
+    return result;
+  }
+
+  async findTaskListById(taskListId: bigint) {
+    const taskList = await prisma.taskList.findUnique({
+      where: {
+        id: taskListId,
+      },
+    });
+
+    return taskList;
+  }
+
+  async getTaskListTasksById(taskListId: bigint) {
+    const taskList = await prisma.taskList.findUnique({
+      where: {
+        id: taskListId,
+      },
+      include: {
+        tasks: true,
+      },
+    });
+
+    if (!taskList || taskList.tasks.length === 0) return null;
+    return taskList.tasks;
+  }
+
+  async assignUser(taskListId: bigint, userId: string): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
+
   async create(data: Prisma.TaskListCreateInput) {
     const list = await prisma.taskList.create({
       data,
