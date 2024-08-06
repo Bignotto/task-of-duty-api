@@ -49,6 +49,7 @@ model User {
   tasksCreated     Task[]       @relation(name: "task_creator")
   taskListsCreated TaskList[]   @relation(name: "task_list_creator")
   userInvites      UserInvite[] @relation(name: "creator_invite")
+  listsAssigned    TaskList[]
 
   @@map("users")
 }
@@ -106,6 +107,8 @@ model TaskList {
 
   creator   User   @relation(name: "task_list_creator", fields: [creatorId], references: [id])
   creatorId String
+
+  assignees User[]
 
   @@map("taskLists")
 }
