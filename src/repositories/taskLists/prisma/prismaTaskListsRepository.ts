@@ -45,7 +45,21 @@ export class PrismaTaskListsRepository implements ITaskListsRepository {
   }
 
   async assignUser(taskListId: bigint, userId: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
+    const taskList = await prisma.taskList.update({
+      where: {
+        id: taskListId,
+      },
+      data: {
+        assignees: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    if (!taskList) return false;
+    return true;
   }
 
   async create(data: Prisma.TaskListCreateInput) {
