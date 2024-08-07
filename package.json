@@ -20,6 +20,7 @@
   "author": "Thiago Bignotto",
   "license": "MIT",
   "devDependencies": {
+    "@faker-js/faker": "8.4.1",
     "@rocketseat/eslint-config": "2.2.2",
     "@types/bcryptjs": "2.4.6",
     "@types/node": "20.14.10",

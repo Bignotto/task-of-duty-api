@@ -87,6 +87,7 @@ describe("Create New User Use Case", () => {
     });
 
     expect(newUser.userType).toEqual(UserType.USER);
+    expect(newUser.partOfOrganizationId).toEqual(organization.id);
   });
 
   it("should not be able to register using an invalid invite", async () => {
