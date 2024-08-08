@@ -1,5 +1,7 @@
+import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryTaskListsRepository } from "@/repositories/taskLists/inMemory/inMemoryTaskListsRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
+import { makeOrg } from "@/utils/tests/makeOrg";
 import { makeUser } from "@/utils/tests/makeUser";
 import { TaskList, User } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -21,11 +23,18 @@ describe("Assign TaskList to User", () => {
     sut = new AssignListToUserUseCase(taskListsRepository, usersRepository);
 
     user = await makeUser({}, usersRepository);
+
+    const organizationsRepository = new InMemoryOrganizationsRepository();
+    const organization = await makeOrg(
+      {
+        ownerId: user.id,
+      },
+      organizationsRepository,
+    );
   });
 
   it("should be able to assign task list to user", () => {
     //NEXT: finish tests
-    console.log({ ESSE: user });
     expect(true).toBe(true);
   });
 });
