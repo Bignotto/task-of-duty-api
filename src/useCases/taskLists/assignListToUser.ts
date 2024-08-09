@@ -15,7 +15,10 @@ export class AssignListToUserUseCase {
     private usersRepository: IUsersRepository,
   ) {}
 
-  async execute({ userId, taskListId }: AssignUserToTaskListRequest) {
+  async execute({
+    userId,
+    taskListId,
+  }: AssignUserToTaskListRequest): Promise<boolean> {
     const user = await this.usersRepository.findById(userId);
     if (!user)
       throw new NotFoundError({
@@ -40,5 +43,6 @@ export class AssignListToUserUseCase {
     );
 
     if (!result) throw new AssignmentError();
+    return true;
   }
 }
