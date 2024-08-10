@@ -6,4 +6,6 @@ export interface ITaskListsRepository {
 
   findTaskListById(taskListId: bigint): Promise<TaskList | null>;
   getTaskListTasksById(taskListId: bigint): Promise<Task[] | null>;
+
+  assignUser(taskListId: bigint, userId: string): Promise<boolean>;
 }

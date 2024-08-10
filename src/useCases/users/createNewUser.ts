@@ -63,6 +63,11 @@ export class CreateNewUserUseCase {
       passwordHash,
       phone: cleanedPhone,
       userType: inviteId ? UserType.USER : UserType.ORGANIZATION,
+      partOfOrganization: {
+        connect: {
+          id: invite?.organizationId,
+        },
+      },
     });
     return { user };
   }

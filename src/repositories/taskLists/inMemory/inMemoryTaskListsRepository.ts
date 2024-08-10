@@ -16,6 +16,11 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
     taskId: bigint;
   }[] = [];
 
+  private assigned_users: {
+    listId: bigint;
+    userId: string;
+  }[] = [];
+
   async create(data: Prisma.TaskListCreateInput) {
     const newTaskList: TaskList = {
       id: BigInt(this.lists.length + 1),
@@ -69,5 +74,14 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
     );
 
     return tasks;
+  }
+
+  async assignUser(taskListId: bigint, userId: string): Promise<boolean> {
+    this.assigned_users.push({
+      listId: taskListId,
+      userId,
+    });
+
+    return Promise.resolve(true);
   }
 }
