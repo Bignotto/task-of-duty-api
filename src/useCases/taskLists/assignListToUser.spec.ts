@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryTaskListsRepository } from "@/repositories/taskLists/inMemory/inMemoryTaskListsRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
@@ -7,6 +8,7 @@ import { makeUser } from "@/utils/tests/makeUser";
 import { Organization, TaskList, User } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { AssignListToUserUseCase } from "./assignListToUser";
+import { WrongOrganizationError } from "./errors/WrongOrganizationError";
 
 let taskListsRepository: InMemoryTaskListsRepository;
 let usersRepository: InMemoryUsersRepository;
@@ -86,5 +88,39 @@ describe("Assign TaskList to User", () => {
     });
 
     expect(result).toBe(true);
+  });
+
+  it("should not be able to assign task list to invalid user", async () => {
+    await expect(
+      sut.execute({
+        taskListId: taskList.id,
+        userId: "wrong user id",
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("should not be able to assign invalid task list to user", async () => {
+    await expect(
+      sut.execute({
+        taskListId: BigInt(42),
+        userId: user.id,
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("should not be able to assign task list to user from other organization", async () => {
+    const otherUser = await makeUser(
+      {
+        orgId: "other organization",
+      },
+      usersRepository,
+    );
+
+    await expect(
+      sut.execute({
+        taskListId: taskList.id,
+        userId: otherUser.id,
+      }),
+    ).rejects.toBeInstanceOf(WrongOrganizationError);
   });
 });
