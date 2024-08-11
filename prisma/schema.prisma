@@ -51,6 +51,8 @@ model User {
   userInvites      UserInvite[] @relation(name: "creator_invite")
   listsAssigned    TaskList[]
 
+  tasksDone TaskDone[] @relation(name: "user_done_task")
+
   @@map("users")
 }
 
@@ -68,6 +70,8 @@ model Organization {
 
   taskLists    TaskList[]
   invitedUsers UserInvite[] @relation(name: "organization_invite_user")
+
+  tasksDone TaskDone[] @relation(name: "org_done_task")
 
   @@map("organizations")
 }
@@ -91,6 +95,8 @@ model Task {
   creatorId String
 
   lists TaskList[]
+
+  tasksDone TaskDone[] @relation(name: "task_done_task")
 
   @@map("tasks")
 }
@@ -131,4 +137,20 @@ model UserInvite {
   status InviteStatus @default(OPEN)
 
   @@map("userInvites")
+}
+
+model TaskDone {
+  id      BigInt  @id @default(autoincrement())
+  comment String?
+
+  doneDate DateTime @default(now())
+
+  user   User   @relation(name: "user_done_task", fields: [userId], references: [id])
+  userId String
+
+  task   Task   @relation(name: "task_done_task", fields: [taskId], references: [id])
+  taskId BigInt
+
+  organization   Organization @relation(name: "org_done_task", fields: [organizationId], references: [id])
+  organizationId String
 }

@@ -1,4 +1,4 @@
-import { Prisma, Task } from "@prisma/client";
+import { Prisma, Task, TaskDone } from "@prisma/client";
 import { ITasksRepository } from "../ITasksRepository";
 
 export class InMemoryTasksRepository implements ITasksRepository {
@@ -7,6 +7,8 @@ export class InMemoryTasksRepository implements ITasksRepository {
     taskIndex: number;
     userId: string;
   }[] = [];
+
+  public tasksDone: TaskDone[] = [];
 
   async create(data: Prisma.TaskCreateInput) {
     const tomorrow = new Date();
@@ -45,5 +47,20 @@ export class InMemoryTasksRepository implements ITasksRepository {
     });
 
     return true;
+  }
+
+  async markTaskDone(data: Prisma.TaskDoneCreateInput): Promise<TaskDone> {
+    const taskDone: TaskDone = {
+      comment: `${data.comment}`,
+      doneDate: new Date(),
+      id: BigInt(this.tasksDone.length + 1),
+      organizationId: `${data.organization.connect?.id}`,
+      taskId: BigInt(`${data.task.connect?.id}`),
+      userId: `${data.user.connect?.id}`,
+    };
+
+    this.tasksDone.push(taskDone);
+
+    return taskDone;
   }
 }
