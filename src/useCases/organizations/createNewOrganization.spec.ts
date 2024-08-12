@@ -105,4 +105,22 @@ describe("Create New Organization Use Case", () => {
     const updatedUser = await usersRepository.findById(user.id);
     expect(updatedUser?.userType).toEqual(UserType.ORGANIZATION);
   });
+
+  it("should update user organization when registering a new organization as the owner", async () => {
+    const user = await usersRepository.create({
+      name: "Mary Jane",
+      email: "mj@dailyplanet.com",
+      passwordHash: await hash("123456", 6),
+    });
+
+    const { organization } = await sut.execute({
+      cnpj: "51049401000177",
+      fantasyName: "Bugle",
+      name: "Daily Bugle",
+      ownerId: user.id,
+    });
+
+    const updatedUser = await usersRepository.findById(user.id);
+    expect(updatedUser?.partOfOrganizationId).toEqual(organization.id);
+  });
 });
