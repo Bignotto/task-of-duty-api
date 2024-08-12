@@ -6,4 +6,5 @@ export interface IUsersRepository {
   findById(userId: string): Promise<User | null>;
 
   setUserType(userId: string, userType: UserType): Promise<void>;
+  setUserOrganization(userId: string, organizationId: string): Promise<User>;
 }

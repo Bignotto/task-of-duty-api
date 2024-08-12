@@ -46,4 +46,14 @@ export class InMemoryUsersRepository implements IUsersRepository {
     const userIndex = this.items.findIndex((item) => item.id === userId);
     this.items[userIndex].userType = userType;
   }
+
+  async setUserOrganization(
+    userId: string,
+    organizationId: string,
+  ): Promise<User> {
+    const userIndex = this.items.findIndex((item) => item.id === userId);
+    this.items[userIndex].partOfOrganizationId = organizationId;
+
+    return this.items[userIndex];
+  }
 }

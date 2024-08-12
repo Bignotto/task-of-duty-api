@@ -45,6 +45,7 @@ export class CreateNewOrganizationUseCase {
     });
 
     await this.usersRepository.setUserType(ownerId, UserType.ORGANIZATION);
+    await this.usersRepository.setUserOrganization(ownerId, organization.id);
 
     return { organization };
   }
