@@ -63,4 +63,9 @@ export class InMemoryTasksRepository implements ITasksRepository {
 
     return taskDone;
   }
+
+  async deleteTask(taskId: bigint): Promise<void> {
+    const taskIndex = this.items.findIndex((t) => t.id === taskId);
+    this.items.splice(taskIndex, 1);
+  }
 }
