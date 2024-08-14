@@ -8,4 +8,6 @@ export interface ITasksRepository {
   assignUser(taskId: bigint, assigneeId: string): Promise<boolean>;
 
   markTaskDone(data: Prisma.TaskDoneCreateInput): Promise<TaskDone>;
+
+  deleteTask(taskId: bigint): Promise<void>;
 }
