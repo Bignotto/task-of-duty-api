@@ -1,5 +1,5 @@
 import { Prisma, Task, TaskDone } from "@prisma/client";
-import { ITasksRepository } from "../ITasksRepository";
+import { ITasksRepository, TaskUpdateInterface } from "../ITasksRepository";
 
 export class InMemoryTasksRepository implements ITasksRepository {
   public items: Task[] = [];
@@ -67,5 +67,21 @@ export class InMemoryTasksRepository implements ITasksRepository {
   async deleteTask(taskId: bigint): Promise<void> {
     const taskIndex = this.items.findIndex((t) => t.id === taskId);
     this.items.splice(taskIndex, 1);
+  }
+
+  async updateTask(data: TaskUpdateInterface): Promise<Task> {
+    const taskIndex = this.items.findIndex((t) => t.id === data.id);
+
+    this.items[taskIndex].title = data.title ?? this.items[taskIndex].title;
+    this.items[taskIndex].description =
+      data.description ?? this.items[taskIndex].description;
+    this.items[taskIndex].recurrenceType =
+      data.recurrenceType ?? this.items[taskIndex].recurrenceType;
+    this.items[taskIndex].taskType =
+      data.taskType ?? this.items[taskIndex].taskType;
+    this.items[taskIndex].dueDate =
+      data.dueDate ?? this.items[taskIndex].dueDate;
+
+    return this.items[taskIndex];
   }
 }

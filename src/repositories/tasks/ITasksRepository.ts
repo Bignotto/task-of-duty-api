@@ -1,4 +1,19 @@
-import { Prisma, Task, TaskDone } from "@prisma/client";
+import {
+  Prisma,
+  RecurrenceType,
+  Task,
+  TaskDone,
+  TaskType,
+} from "@prisma/client";
+
+export interface TaskUpdateInterface {
+  id: bigint;
+  title?: string;
+  description?: string;
+  recurrenceType?: RecurrenceType;
+  taskType?: TaskType;
+  dueDate?: Date;
+}
 
 export interface ITasksRepository {
   create(data: Prisma.TaskCreateInput): Promise<Task>;
@@ -10,4 +25,6 @@ export interface ITasksRepository {
   markTaskDone(data: Prisma.TaskDoneCreateInput): Promise<TaskDone>;
 
   deleteTask(taskId: bigint): Promise<void>;
+
+  updateTask(data: TaskUpdateInterface): Promise<Task>;
 }
