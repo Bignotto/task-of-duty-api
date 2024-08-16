@@ -40,10 +40,13 @@ export class CreateNewTaskUseCase {
         sub: creatorId,
       });
 
+    //TODO: use global error
     if (creator.userType !== UserType.ORGANIZATION)
       throw new NotOrganizationOwnerError({
         origin: "CreateNewTaskUseCase",
       });
+
+    //TODO: validate if due date is not in the past
 
     const task = await this.tasksRepository.create({
       title,
