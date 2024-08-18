@@ -5,7 +5,10 @@ import {
   TaskList,
   TaskType,
 } from "@prisma/client";
-import { ITaskListsRepository } from "../ITaskListsRepository";
+import {
+  ITaskListsRepository,
+  TaskListUpdateInterface,
+} from "../ITaskListsRepository";
 
 export class InMemoryTaskListsRepository implements ITaskListsRepository {
   public lists: TaskList[] = [];
@@ -95,5 +98,16 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
       (relation) => relation.listId !== taskListId,
     );
     this.list_have_tasks = relation;
+  }
+
+  async updateTaskList(data: TaskListUpdateInterface): Promise<TaskList> {
+    const taskListIndex = this.lists.findIndex((list) => list.id === data.id);
+
+    this.lists[taskListIndex].title =
+      data.title ?? this.lists[taskListIndex].title;
+    this.lists[taskListIndex].description =
+      data.description ?? this.lists[taskListIndex].description;
+
+    return this.lists[taskListIndex];
   }
 }
