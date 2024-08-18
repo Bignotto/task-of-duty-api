@@ -8,4 +8,6 @@ export interface ITaskListsRepository {
   getTaskListTasksById(taskListId: bigint): Promise<Task[] | null>;
 
   assignUser(taskListId: bigint, userId: string): Promise<boolean>;
+
+  deleteTaskList(taskListId: bigint): Promise<void>;
 }
