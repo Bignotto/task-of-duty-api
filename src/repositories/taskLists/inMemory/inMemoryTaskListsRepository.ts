@@ -8,7 +8,7 @@ import {
 import { ITaskListsRepository } from "../ITaskListsRepository";
 
 export class InMemoryTaskListsRepository implements ITaskListsRepository {
-  private lists: TaskList[] = [];
+  public lists: TaskList[] = [];
   private tasks: Task[] = [];
 
   private list_have_tasks: {
@@ -83,5 +83,17 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
     });
 
     return Promise.resolve(true);
+  }
+
+  async deleteTaskList(taskListId: bigint): Promise<void> {
+    const taskListIndex = this.lists.findIndex(
+      (list) => list.id === taskListId,
+    );
+    this.lists.splice(taskListIndex, 1);
+
+    const relation = this.list_have_tasks.filter(
+      (relation) => relation.listId !== taskListId,
+    );
+    this.list_have_tasks = relation;
   }
 }
