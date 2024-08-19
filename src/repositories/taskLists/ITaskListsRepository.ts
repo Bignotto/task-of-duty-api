@@ -17,4 +17,6 @@ export interface ITaskListsRepository {
   deleteTaskList(taskListId: bigint): Promise<void>;
 
   updateTaskList(data: TaskListUpdateInterface): Promise<TaskList>;
+
+  removeTaskFromList(taskListId: bigint, taskId: bigint): Promise<boolean>;
 }
