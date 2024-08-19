@@ -110,4 +110,18 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
 
     return this.lists[taskListIndex];
   }
+
+  async removeTaskFromList(
+    taskListId: bigint,
+    taskId: bigint,
+  ): Promise<boolean> {
+    const relationIndex = this.list_have_tasks.findIndex(
+      (i) => i.listId === taskListId && i.taskId === taskId,
+    );
+    if (relationIndex < 0) return false;
+
+    this.list_have_tasks.splice(relationIndex, 1);
+
+    return true;
+  }
 }

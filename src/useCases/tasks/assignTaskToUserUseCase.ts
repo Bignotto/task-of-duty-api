@@ -3,7 +3,7 @@ import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationEr
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 
-interface AssingTaskToUserRequest {
+interface AssignTaskToUserRequest {
   taskId: bigint;
   assigneeId: string;
 }
@@ -21,17 +21,17 @@ export class AssignTaskToUserUseCase {
   async execute({
     taskId,
     assigneeId,
-  }: AssingTaskToUserRequest): Promise<AssignTaskToUserResponse> {
+  }: AssignTaskToUserRequest): Promise<AssignTaskToUserResponse> {
     const assignee = await this.usersRepository.findById(assigneeId);
     if (!assignee)
       throw new NotFoundError({
-        origin: "AssingTaskToUserUseCase",
+        origin: "AssignTaskToUserUseCase",
         sub: "assignee",
       });
     const task = await this.tasksRepository.findById(taskId);
     if (!task)
       throw new NotFoundError({
-        origin: "AssingTaskToUserUseCase",
+        origin: "AssignTaskToUserUseCase",
         sub: "task",
       });
 
