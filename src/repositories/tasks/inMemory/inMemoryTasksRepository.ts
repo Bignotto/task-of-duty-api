@@ -4,7 +4,7 @@ import { ITasksRepository, TaskUpdateInterface } from "../ITasksRepository";
 export class InMemoryTasksRepository implements ITasksRepository {
   public items: Task[] = [];
   public usersAssignedTasks: {
-    taskIndex: number;
+    taskId: bigint;
     userId: string;
   }[] = [];
 
@@ -42,7 +42,7 @@ export class InMemoryTasksRepository implements ITasksRepository {
     if (index < 0) return false;
 
     this.usersAssignedTasks.push({
-      taskIndex: index,
+      taskId: taskId,
       userId: assigneeId,
     });
 
@@ -83,5 +83,16 @@ export class InMemoryTasksRepository implements ITasksRepository {
       data.dueDate ?? this.items[taskIndex].dueDate;
 
     return this.items[taskIndex];
+  }
+
+  async unassignUser(taskId: bigint, assigneeId: string): Promise<boolean> {
+    const relationIndex = this.usersAssignedTasks.findIndex(
+      (i) => i.taskId === taskId && i.userId === assigneeId,
+    );
+    if (relationIndex < 0) return false;
+
+    this.usersAssignedTasks.splice(relationIndex, 1);
+
+    return true;
   }
 }
