@@ -1,4 +1,4 @@
-import { Prisma, Task, TaskDone } from "@prisma/client";
+import { Prisma, Task, TaskDone, User } from "@prisma/client";
 import { ITasksRepository, TaskUpdateInterface } from "../ITasksRepository";
 
 export class InMemoryTasksRepository implements ITasksRepository {
@@ -9,6 +9,7 @@ export class InMemoryTasksRepository implements ITasksRepository {
   }[] = [];
 
   public tasksDone: TaskDone[] = [];
+  private users: User[] = [];
 
   async create(data: Prisma.TaskCreateInput) {
     const tomorrow = new Date();
@@ -44,6 +45,16 @@ export class InMemoryTasksRepository implements ITasksRepository {
     this.usersAssignedTasks.push({
       taskId: taskId,
       userId: assigneeId,
+    });
+
+    this.users.push({
+      id: assigneeId,
+      email: "some@email.com",
+      name: "user name",
+      partOfOrganizationId: "org id",
+      passwordHash: "hahaha",
+      phone: "12345678901",
+      userType: "ORGANIZATION",
     });
 
     return true;
@@ -94,5 +105,17 @@ export class InMemoryTasksRepository implements ITasksRepository {
     this.usersAssignedTasks.splice(relationIndex, 1);
 
     return true;
+  }
+
+  async getTaskUsers(taskId: bigint): Promise<User[]> {
+    const taskUsers = this.usersAssignedTasks.filter(
+      (t) => t.taskId === taskId,
+    );
+
+    const users = this.users.filter((u) =>
+      taskUsers.find((t) => u.id === t.userId),
+    );
+
+    return users;
   }
 }
