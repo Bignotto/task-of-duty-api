@@ -4,6 +4,7 @@ import {
   Task,
   TaskDone,
   TaskType,
+  User,
 } from "@prisma/client";
 
 export interface TaskUpdateInterface {
@@ -27,4 +28,8 @@ export interface ITasksRepository {
   deleteTask(taskId: bigint): Promise<void>;
 
   updateTask(data: TaskUpdateInterface): Promise<Task>;
+
+  unassignUser(taskId: bigint, assigneeId: string): Promise<boolean>;
+
+  getTaskUsers(taskId: bigint): Promise<User[]>;
 }
