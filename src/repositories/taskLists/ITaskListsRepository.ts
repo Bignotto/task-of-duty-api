@@ -1,4 +1,4 @@
-import { Prisma, Task, TaskList } from "@prisma/client";
+import { Prisma, Task, TaskList, User } from "@prisma/client";
 
 export interface TaskListUpdateInterface {
   id: bigint;
@@ -19,4 +19,8 @@ export interface ITaskListsRepository {
   updateTaskList(data: TaskListUpdateInterface): Promise<TaskList>;
 
   removeTaskFromList(taskListId: bigint, taskId: bigint): Promise<boolean>;
+
+  getTaskListUsers(taskListId: bigint): Promise<User[]>;
+
+  unassignUser(taskListId: bigint, userId: string): Promise<boolean>;
 }
