@@ -4,6 +4,7 @@ import {
   Task,
   TaskList,
   TaskType,
+  User,
 } from "@prisma/client";
 import {
   ITaskListsRepository,
@@ -13,6 +14,7 @@ import {
 export class InMemoryTaskListsRepository implements ITaskListsRepository {
   public lists: TaskList[] = [];
   private tasks: Task[] = [];
+  private users: User[] = [];
 
   private list_have_tasks: {
     listId: bigint;
@@ -85,6 +87,16 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
       userId,
     });
 
+    this.users.push({
+      id: userId,
+      email: "some@email.com",
+      name: "fake user name",
+      partOfOrganizationId: "org id",
+      passwordHash: "hahaha",
+      phone: "12345678901",
+      userType: "ORGANIZATION",
+    });
+
     return Promise.resolve(true);
   }
 
@@ -121,6 +133,28 @@ export class InMemoryTaskListsRepository implements ITaskListsRepository {
     if (relationIndex < 0) return false;
 
     this.list_have_tasks.splice(relationIndex, 1);
+
+    return true;
+  }
+
+  async getTaskListUsers(taskListId: bigint) {
+    const listUserIds = this.assigned_users.filter(
+      (l) => (l.listId = taskListId),
+    );
+    const users = this.users.filter((t) =>
+      listUserIds.find((l) => l.userId === t.id),
+    );
+
+    return users;
+  }
+
+  async unassignUser(taskListId: bigint, userId: string) {
+    const relationIndex = this.assigned_users.findIndex(
+      (i) => i.listId === taskListId && i.userId === userId,
+    );
+    if (relationIndex < 0) return false;
+
+    this.assigned_users.splice(relationIndex, 1);
 
     return true;
   }
