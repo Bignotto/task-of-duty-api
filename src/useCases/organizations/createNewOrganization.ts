@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { IOrganizationsRepository } from "@/repositories/organizations/IOrganizationsRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { Organization, UserType } from "@prisma/client";
@@ -32,6 +33,13 @@ export class CreateNewOrganizationUseCase {
     const organizationWithSameCnpj =
       await this.organizationsRepository.findByCnpj(cnpj);
     if (organizationWithSameCnpj) throw new CnpjAlreadyInUseError();
+
+    const userFound = await this.usersRepository.findById(ownerId);
+    if (!userFound)
+      throw new NotFoundError({
+        sub: ownerId,
+        origin: "CreateNewOrganizationUseCase",
+      });
 
     const organization = await this.organizationsRepository.create({
       name,

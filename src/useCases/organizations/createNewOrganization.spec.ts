@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
 import { UserType } from "@prisma/client";
@@ -122,5 +123,16 @@ describe("Create New Organization Use Case", () => {
 
     const updatedUser = await usersRepository.findById(user.id);
     expect(updatedUser?.partOfOrganizationId).toEqual(organization.id);
+  });
+
+  it("should not create new organization with invalid user", async () => {
+    await expect(
+      sut.execute({
+        cnpj: "51049401000177",
+        fantasyName: "Bugle",
+        name: "Daily Bugle",
+        ownerId: "invalid user id",
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });
