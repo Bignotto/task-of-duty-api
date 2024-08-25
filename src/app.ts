@@ -3,6 +3,7 @@ import fastifyJwt from "@fastify/jwt";
 import { fastify } from "fastify";
 import { ZodError } from "zod";
 import { env } from "./env";
+import organizationRoutes from "./http/controllers/organizations/routes";
 import { sessionRoutes } from "./http/controllers/sessions/routes";
 import { usersRoutes } from "./http/controllers/users/routes";
 
@@ -23,6 +24,7 @@ app.register(fastifyJwt, {
 
 app.register(usersRoutes);
 app.register(sessionRoutes);
+app.register(organizationRoutes);
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {
@@ -37,5 +39,5 @@ app.setErrorHandler((error, _, reply) => {
     //TODO: log unknown error
   }
 
-  return reply.status(500).send({ message: "Fodeu..." });
+  return reply.status(500).send({ message: "Unknown error..." });
 });
