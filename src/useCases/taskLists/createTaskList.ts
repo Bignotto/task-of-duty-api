@@ -1,9 +1,10 @@
 import { NotFoundError } from "@/globals/errors/NotFoundError";
+import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationError";
 import { IOrganizationsRepository } from "@/repositories/organizations/IOrganizationsRepository";
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
 import { TaskList, UserType } from "@prisma/client";
-import { NotOrganizationAdminError } from "./errors/NotOrganizationAdminError";
+import { NotOrganizationAdminError } from "../../globals/errors/NotOrganizationAdminError";
 
 interface CreateTaskListUseCaseRequest {
   title: string;
@@ -46,7 +47,8 @@ export class CreateTaskListUseCase {
         sub: organizationId,
       });
 
-    if (organization.ownerId !== user.id) throw new NotOrganizationAdminError();
+    if (organization.id !== user.partOfOrganizationId)
+      throw new NotSameOrganizationError();
 
     const list = await this.taskListsRepository.create({
       title,

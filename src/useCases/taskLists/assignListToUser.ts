@@ -1,12 +1,15 @@
 import { NotFoundError } from "@/globals/errors/NotFoundError";
+import { NotOrganizationAdminError } from "@/globals/errors/NotOrganizationAdminError";
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
+import { UserType } from "@prisma/client";
 import { AssignmentError } from "./errors/AssignmentError";
 import { WrongOrganizationError } from "./errors/WrongOrganizationError";
 
 interface AssignUserToTaskListRequest {
-  userId: string;
+  assigneeId: string;
   taskListId: bigint;
+  userId: string;
 }
 
 export class AssignListToUserUseCase {
@@ -16,14 +19,24 @@ export class AssignListToUserUseCase {
   ) {}
 
   async execute({
-    userId,
+    assigneeId,
     taskListId,
+    userId,
   }: AssignUserToTaskListRequest): Promise<boolean> {
     const user = await this.usersRepository.findById(userId);
     if (!user)
       throw new NotFoundError({
         origin: "AssignListToUserUseCase",
         sub: userId,
+      });
+    if (user.userType !== UserType.ORGANIZATION)
+      throw new NotOrganizationAdminError();
+
+    const assignee = await this.usersRepository.findById(assigneeId);
+    if (!assignee)
+      throw new NotFoundError({
+        origin: "AssignListToUserUseCase",
+        sub: assigneeId,
       });
 
     const taskList =
@@ -34,12 +47,12 @@ export class AssignListToUserUseCase {
         sub: taskListId.toString(),
       });
 
-    if (user.partOfOrganizationId !== taskList.organizationId)
+    if (assignee.partOfOrganizationId !== taskList.organizationId)
       throw new WrongOrganizationError();
 
     const result = await this.taskListsRepository.assignUser(
       taskListId,
-      userId,
+      assigneeId,
     );
 
     if (!result) throw new AssignmentError();

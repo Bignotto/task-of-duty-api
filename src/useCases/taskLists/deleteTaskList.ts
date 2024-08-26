@@ -1,7 +1,9 @@
 import { NotFoundError } from "@/globals/errors/NotFoundError";
+import { NotOrganizationAdminError } from "@/globals/errors/NotOrganizationAdminError";
 import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationError";
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
+import { UserType } from "@prisma/client";
 
 interface DeleteTaskListRequest {
   taskListId: bigint;
@@ -15,19 +17,21 @@ export class DeleteTaskListUseCase {
   ) {}
 
   async execute({ taskListId, userId }: DeleteTaskListRequest) {
+    const user = await this.usersRepository.findById(userId);
+    if (!user)
+      throw new NotFoundError({
+        origin: "DeleteTaskListUseCase",
+        sub: userId,
+      });
+    if (user.userType !== UserType.ORGANIZATION)
+      throw new NotOrganizationAdminError();
+
     const taskList =
       await this.taskListsRepository.findTaskListById(taskListId);
     if (!taskList)
       throw new NotFoundError({
         origin: "DeleteTaskListUseCase",
         sub: taskListId.toString(),
-      });
-
-    const user = await this.usersRepository.findById(userId);
-    if (!user)
-      throw new NotFoundError({
-        origin: "DeleteTaskListUseCase",
-        sub: userId,
       });
 
     if (user.partOfOrganizationId !== taskList.organizationId)

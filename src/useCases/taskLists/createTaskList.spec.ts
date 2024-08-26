@@ -1,11 +1,14 @@
 import { NotFoundError } from "@/globals/errors/NotFoundError";
+import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationError";
 import { InMemoryOrganizationsRepository } from "@/repositories/organizations/inMemory/organizationRepository";
 import { InMemoryTaskListsRepository } from "@/repositories/taskLists/inMemory/inMemoryTaskListsRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
+import { makeOrg } from "@/utils/tests/makeOrg";
+import { makeUser } from "@/utils/tests/makeUser";
 import { Organization, User, UserType } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
+import { NotOrganizationAdminError } from "../../globals/errors/NotOrganizationAdminError";
 import { CreateTaskListUseCase } from "./createTaskList";
-import { NotOrganizationAdminError } from "./errors/NotOrganizationAdminError";
 
 let user: User;
 let organization: Organization;
@@ -26,23 +29,15 @@ describe("Create Task List Use Case", () => {
       organizationsRepository,
     );
 
-    user = await usersRepository.create({
-      email: "mj@dailybuggle.com",
-      name: "Mary Jane",
-      passwordHash: "hashed_password",
-      userType: UserType.ORGANIZATION,
-    });
+    organization = await makeOrg({}, organizationsRepository);
 
-    organization = await organizationsRepository.create({
-      cnpj: "12345678901234",
-      fantasyName: "The Buggle",
-      name: "The Daily Buggle",
-      owner: {
-        connect: {
-          id: user.id,
-        },
+    user = await makeUser(
+      {
+        orgId: organization.id,
+        userType: UserType.ORGANIZATION,
       },
-    });
+      usersRepository,
+    );
   });
 
   it("should be able to create a new task list", async () => {
@@ -91,13 +86,27 @@ describe("Create Task List Use Case", () => {
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it("should not be able to create new task list with creator not being owner of organization", async () => {
-    const newUser = await usersRepository.create({
-      email: "jj@dailybuggle.com",
-      name: "JJ Jameson",
-      passwordHash: "hashed_password",
-      userType: UserType.ORGANIZATION,
-    });
+  it("should not be able to create new task list with another organization", async () => {
+    const otherOrganization = await makeOrg({}, organizationsRepository);
+
+    await expect(
+      sut.execute({
+        creatorId: user.id,
+        description: "Get a first page history step by step.",
+        title: "First Page",
+        organizationId: otherOrganization.id,
+      }),
+    ).rejects.toBeInstanceOf(NotSameOrganizationError);
+  });
+
+  it("should not be able to create new task list with creator not being organization admin", async () => {
+    const newUser = await makeUser(
+      {
+        orgId: organization.id,
+        userType: UserType.USER,
+      },
+      usersRepository,
+    );
 
     await expect(
       sut.execute({

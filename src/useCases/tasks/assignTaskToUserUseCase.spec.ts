@@ -1,4 +1,5 @@
 import { NotFoundError } from "@/globals/errors/NotFoundError";
+import { NotOrganizationAdminError } from "@/globals/errors/NotOrganizationAdminError";
 import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationError";
 import { InMemoryTasksRepository } from "@/repositories/tasks/inMemory/inMemoryTasksRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
@@ -112,6 +113,7 @@ describe("Assign Tasks to Users Use Case", () => {
     const { result } = await sut.execute({
       assigneeId: userA.id,
       taskId: task1.id,
+      userId: userOwner.id,
     });
 
     expect(result).toBe(true);
@@ -139,6 +141,7 @@ describe("Assign Tasks to Users Use Case", () => {
       sut.execute({
         assigneeId: userA.id,
         taskId: otherOrganizationTask.id,
+        userId: userOwner.id,
       }),
     ).rejects.toBeInstanceOf(NotSameOrganizationError);
   });
@@ -147,11 +150,13 @@ describe("Assign Tasks to Users Use Case", () => {
     const { result: resultA } = await sut.execute({
       assigneeId: userA.id,
       taskId: task1.id,
+      userId: userOwner.id,
     });
 
     const { result: resultB } = await sut.execute({
       assigneeId: userB.id,
       taskId: task1.id,
+      userId: userOwner.id,
     });
 
     expect(resultA).toBe(true);
@@ -163,6 +168,7 @@ describe("Assign Tasks to Users Use Case", () => {
       sut.execute({
         assigneeId: "invalid user",
         taskId: task1.id,
+        userId: userOwner.id,
       }),
     ).rejects.toBeInstanceOf(NotFoundError);
   });
@@ -172,7 +178,28 @@ describe("Assign Tasks to Users Use Case", () => {
       sut.execute({
         assigneeId: userA.id,
         taskId: BigInt(55),
+        userId: userOwner.id,
       }),
     ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("should not be possible to assign user a task with invalid owner", async () => {
+    await expect(
+      sut.execute({
+        assigneeId: userA.id,
+        taskId: task1.id,
+        userId: "wrong owner id",
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("should not be possible to assign user a task with not admin owner", async () => {
+    await expect(
+      sut.execute({
+        assigneeId: userA.id,
+        taskId: task1.id,
+        userId: userB.id,
+      }),
+    ).rejects.toBeInstanceOf(NotOrganizationAdminError);
   });
 }); //describe

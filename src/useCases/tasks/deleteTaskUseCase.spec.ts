@@ -4,7 +4,7 @@ import { InMemoryTasksRepository } from "@/repositories/tasks/inMemory/inMemoryT
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
 import { makeTask } from "@/utils/tests/makeTask";
 import { makeUser } from "@/utils/tests/makeUser";
-import { Task, User } from "@prisma/client";
+import { Task, User, UserType } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { DeleteTaskUseCase } from "./deleteTaskUseCase";
 
@@ -23,7 +23,13 @@ describe("Delete Task Use Case", () => {
 
     sut = new DeleteTaskUseCase(tasksRepository, usersRepository);
 
-    user = await makeUser({}, usersRepository);
+    user = await makeUser(
+      {
+        userType: UserType.ORGANIZATION,
+        orgId: "Fake Org",
+      },
+      usersRepository,
+    );
   });
 
   it("should be able to delete a task", async () => {
@@ -43,7 +49,7 @@ describe("Delete Task Use Case", () => {
     expect(tasksRepository.items.length).toBe(0);
   });
 
-  it("should not be able to delete an invalid test", async () => {
+  it("should not be able to delete an invalid task", async () => {
     await expect(
       sut.execute({
         taskId: BigInt(42),

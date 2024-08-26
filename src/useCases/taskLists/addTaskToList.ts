@@ -1,12 +1,15 @@
 import { NotFoundError } from "@/globals/errors/NotFoundError";
+import { NotOrganizationAdminError } from "@/globals/errors/NotOrganizationAdminError";
 import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
 import { IUsersRepository } from "@/repositories/users/IUsersRepository";
+import { UserType } from "@prisma/client";
 import { WrongOrganizationError } from "./errors/WrongOrganizationError";
 
 interface AddTaskToListRequest {
   taskListId: bigint;
   taskId: bigint;
+  userId: string;
 }
 
 export class AddTaskToListUseCase {
@@ -16,7 +19,16 @@ export class AddTaskToListUseCase {
     private usersRepository: IUsersRepository,
   ) {}
 
-  async execute({ taskListId, taskId }: AddTaskToListRequest) {
+  async execute({ taskListId, taskId, userId }: AddTaskToListRequest) {
+    const user = await this.usersRepository.findById(userId);
+    if (!user)
+      throw new NotFoundError({
+        origin: "AddTaskToListUseCase",
+        sub: `userId:${userId}`,
+      });
+    if (user.userType !== UserType.ORGANIZATION)
+      throw new NotOrganizationAdminError();
+
     const task = await this.tasksRepository.findById(taskId);
     if (!task)
       throw new NotFoundError({

@@ -113,6 +113,7 @@ describe("Add Task to Task List Use Case", () => {
       sut.execute({
         taskId: task1.id,
         taskListId: taskList.id,
+        userId: user.id,
       }),
     ).resolves.toBe(taskList);
   });
@@ -132,6 +133,7 @@ describe("Add Task to Task List Use Case", () => {
       sut.execute({
         taskId: BigInt(2405),
         taskListId: taskList.id,
+        userId: user.id,
       }),
     ).rejects.toBeInstanceOf(NotFoundError);
   });
@@ -141,6 +143,7 @@ describe("Add Task to Task List Use Case", () => {
       sut.execute({
         taskId: task2.id,
         taskListId: BigInt(2405),
+        userId: user.id,
       }),
     ).rejects.toBeInstanceOf(NotFoundError);
   });
@@ -176,6 +179,7 @@ describe("Add Task to Task List Use Case", () => {
       sut.execute({
         taskId: task2.id,
         taskListId: otherTaskList.id,
+        userId: user.id,
       }),
     ).rejects.toBeInstanceOf(WrongOrganizationError);
   });

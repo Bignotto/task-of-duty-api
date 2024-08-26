@@ -5,7 +5,7 @@ import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepo
 import { makeOrg } from "@/utils/tests/makeOrg";
 import { makeTaskList } from "@/utils/tests/makeTaskList";
 import { makeUser } from "@/utils/tests/makeUser";
-import { Organization, TaskList, User } from "@prisma/client";
+import { Organization, TaskList, User, UserType } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { AssignListToUserUseCase } from "./assignListToUser";
 import { WrongOrganizationError } from "./errors/WrongOrganizationError";
@@ -27,7 +27,12 @@ describe("Assign TaskList to User", () => {
 
     sut = new AssignListToUserUseCase(taskListsRepository, usersRepository);
 
-    user = await makeUser({}, usersRepository);
+    user = await makeUser(
+      {
+        userType: UserType.ORGANIZATION,
+      },
+      usersRepository,
+    );
 
     organizationsRepository = new InMemoryOrganizationsRepository();
     organization = await makeOrg(
@@ -56,7 +61,8 @@ describe("Assign TaskList to User", () => {
 
     const result = await sut.execute({
       taskListId: taskList.id,
-      userId: newUser.id,
+      assigneeId: newUser.id,
+      userId: user.id,
     });
     expect(result).toBe(true);
   });
@@ -79,12 +85,14 @@ describe("Assign TaskList to User", () => {
 
     await sut.execute({
       taskListId: taskList.id,
-      userId: newUser.id,
+      assigneeId: newUser.id,
+      userId: user.id,
     });
 
     const result = await sut.execute({
       taskListId: newTaskList.id,
-      userId: newUser.id,
+      assigneeId: newUser.id,
+      userId: user.id,
     });
 
     expect(result).toBe(true);
@@ -94,7 +102,8 @@ describe("Assign TaskList to User", () => {
     await expect(
       sut.execute({
         taskListId: taskList.id,
-        userId: "wrong user id",
+        assigneeId: "wrong user id",
+        userId: user.id,
       }),
     ).rejects.toBeInstanceOf(NotFoundError);
   });
@@ -103,6 +112,7 @@ describe("Assign TaskList to User", () => {
     await expect(
       sut.execute({
         taskListId: BigInt(42),
+        assigneeId: user.id,
         userId: user.id,
       }),
     ).rejects.toBeInstanceOf(NotFoundError);
@@ -119,7 +129,8 @@ describe("Assign TaskList to User", () => {
     await expect(
       sut.execute({
         taskListId: taskList.id,
-        userId: otherUser.id,
+        assigneeId: otherUser.id,
+        userId: user.id,
       }),
     ).rejects.toBeInstanceOf(WrongOrganizationError);
   });

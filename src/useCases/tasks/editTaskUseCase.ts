@@ -1,6 +1,9 @@
 import { InvalidDateError } from "@/globals/errors/InvalidDateError";
+import { NotFoundError } from "@/globals/errors/NotFoundError";
+import { NotOrganizationAdminError } from "@/globals/errors/NotOrganizationAdminError";
 import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
-import { RecurrenceType, Task, TaskType } from "@prisma/client";
+import { IUsersRepository } from "@/repositories/users/IUsersRepository";
+import { RecurrenceType, Task, TaskType, UserType } from "@prisma/client";
 import { isBefore } from "date-fns";
 
 interface EditTaskRequest {
@@ -10,6 +13,7 @@ interface EditTaskRequest {
   recurrenceType?: RecurrenceType;
   taskType?: TaskType;
   dueDate?: Date;
+  userId: string;
 }
 
 interface EditTaskResponse {
@@ -17,7 +21,10 @@ interface EditTaskResponse {
 }
 
 export class EditTaskUseCase {
-  constructor(private tasksRepository: ITasksRepository) {}
+  constructor(
+    private tasksRepository: ITasksRepository,
+    private usersRepository: IUsersRepository,
+  ) {}
 
   async execute({
     id,
@@ -26,8 +33,26 @@ export class EditTaskUseCase {
     recurrenceType,
     taskType,
     dueDate,
+    userId,
   }: EditTaskRequest): Promise<EditTaskResponse> {
     if (dueDate && isBefore(dueDate, new Date())) throw new InvalidDateError();
+
+    const foundUser = await this.usersRepository.findById(userId);
+    if (!foundUser)
+      throw new NotFoundError({
+        origin: "EditTaskUseCase",
+        sub: userId,
+      });
+
+    if (foundUser.userType !== UserType.ORGANIZATION)
+      throw new NotOrganizationAdminError();
+
+    const foundTask = await this.tasksRepository.findById(id);
+    if (!foundTask)
+      throw new NotFoundError({
+        origin: "EditTaskUseCase",
+        sub: id.toString(),
+      });
 
     const task = await this.tasksRepository.updateTask({
       id,
