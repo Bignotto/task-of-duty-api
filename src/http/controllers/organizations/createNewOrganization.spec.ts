@@ -1,4 +1,5 @@
 import { app } from "@/app";
+import { createAuthenticatedUser } from "@/utils/tests/createAuthenticatedUser";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -12,18 +13,7 @@ describe("E2E Create Organization Controller", () => {
   });
 
   it("should be able to create new organization", async () => {
-    await request(app.server).post("/users").send({
-      name: "Mary Jane Watson",
-      email: "mj@dailybuggle.com",
-      password: "123456",
-    });
-
-    const authResponse = await request(app.server).post("/sessions").send({
-      email: "mj@dailybuggle.com",
-      password: "123456",
-    });
-
-    const { token } = authResponse.body;
+    const { token } = await createAuthenticatedUser(app);
 
     const response = await request(app.server)
       .post("/organizations")
@@ -36,5 +26,9 @@ describe("E2E Create Organization Controller", () => {
 
     expect(response.status).toEqual(201);
     expect(response.body.fantasyName).toEqual("Fake Org");
+  });
+
+  it("should not be able to create new organization with invalid cnpj", async () => {
+    //TODO: finish controller validation tests
   });
 });
