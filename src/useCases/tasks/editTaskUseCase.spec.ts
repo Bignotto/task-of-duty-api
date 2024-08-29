@@ -1,10 +1,11 @@
 import { InvalidDateError } from "@/globals/errors/InvalidDateError";
+import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { InMemoryTasksRepository } from "@/repositories/tasks/inMemory/inMemoryTasksRepository";
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
 import { makeTask } from "@/utils/tests/makeTask";
 import { makeUser } from "@/utils/tests/makeUser";
-import { Task, User } from "@prisma/client";
-import { subDays } from "date-fns";
+import { Task, User, UserType } from "@prisma/client";
+import { addDays, subDays } from "date-fns";
 import { beforeEach, describe, expect, it } from "vitest";
 import { EditTaskUseCase } from "./editTaskUseCase";
 
@@ -21,9 +22,14 @@ describe("Edit Task Use Case", () => {
     usersRepository = new InMemoryUsersRepository();
     tasksRepository = new InMemoryTasksRepository();
 
-    sut = new EditTaskUseCase(tasksRepository);
+    sut = new EditTaskUseCase(tasksRepository, usersRepository);
 
-    user = await makeUser({}, usersRepository);
+    user = await makeUser(
+      {
+        userType: UserType.ORGANIZATION,
+      },
+      usersRepository,
+    );
   });
 
   it("should be able to edit a task", async () => {
@@ -33,6 +39,7 @@ describe("Edit Task Use Case", () => {
       id: task.id,
       title: "NEW TITLE",
       description: "NEW DESCRIPTION",
+      userId: user.id,
     });
 
     expect(editedTask.id).toEqual(task.id);
@@ -49,7 +56,34 @@ describe("Edit Task Use Case", () => {
         title: "NEW TITLE",
         description: "NEW DESCRIPTION",
         dueDate: subDays(new Date(), 5),
+        userId: user.id,
       }),
     ).rejects.toBeInstanceOf(InvalidDateError);
+  });
+
+  it("should not be able to update an invalid task", async () => {
+    await expect(
+      sut.execute({
+        id: BigInt(42),
+        title: "NEW TITLE",
+        description: "NEW DESCRIPTION",
+        dueDate: addDays(new Date(), 5),
+        userId: user.id,
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("should not be able to update a task with an invalid user", async () => {
+    const task = await makeTask({}, tasksRepository);
+
+    await expect(
+      sut.execute({
+        id: task.id,
+        title: "NEW TITLE",
+        description: "NEW DESCRIPTION",
+        dueDate: addDays(new Date(), 5),
+        userId: "wrong user id",
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });

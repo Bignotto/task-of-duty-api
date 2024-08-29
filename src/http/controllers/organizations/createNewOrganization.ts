@@ -1,5 +1,6 @@
 import { NotFoundError } from "@/globals/errors/NotFoundError";
 import { CnpjAlreadyInUseError } from "@/useCases/organizations/errors/CnpjAlreadyInUseError";
+import { CnpjLengthError } from "@/useCases/organizations/errors/CnpjLengthError";
 import { makeCreateNewOrganizationUseCase } from "@/useCases/organizations/factories/makeCreateNewOrganizationUseCase";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
@@ -31,8 +32,11 @@ export async function createNewOrganization(
   } catch (error) {
     if (
       error instanceof NotFoundError ||
-      error instanceof CnpjAlreadyInUseError
+      error instanceof CnpjAlreadyInUseError ||
+      error instanceof CnpjLengthError
     )
       return reply.status(404).send({ message: error.message });
+
+    throw error;
   }
 }

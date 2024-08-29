@@ -4,7 +4,7 @@ import { InMemoryTaskListsRepository } from "@/repositories/taskLists/inMemory/i
 import { InMemoryUsersRepository } from "@/repositories/users/inMemory/usersRepository";
 import { makeTaskList } from "@/utils/tests/makeTaskList";
 import { makeUser } from "@/utils/tests/makeUser";
-import { Task, User } from "@prisma/client";
+import { Task, User, UserType } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { DeleteTaskListUseCase } from "./deleteTaskList";
 
@@ -23,7 +23,12 @@ describe("Delete Task List Use Case", () => {
 
     sut = new DeleteTaskListUseCase(taskListsRepository, usersRepository);
 
-    user = await makeUser({}, usersRepository);
+    user = await makeUser(
+      {
+        userType: UserType.ORGANIZATION,
+      },
+      usersRepository,
+    );
   });
 
   it("should be able to delete a task list", async () => {
