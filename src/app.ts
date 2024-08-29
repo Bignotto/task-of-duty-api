@@ -3,6 +3,7 @@ import fastifyJwt from "@fastify/jwt";
 import { fastify } from "fastify";
 import { ZodError } from "zod";
 import { env } from "./env";
+import invitesRoutes from "./http/controllers/invites/routes";
 import organizationRoutes from "./http/controllers/organizations/routes";
 import { sessionRoutes } from "./http/controllers/sessions/routes";
 import { usersRoutes } from "./http/controllers/users/routes";
@@ -25,6 +26,7 @@ app.register(fastifyJwt, {
 app.register(usersRoutes);
 app.register(sessionRoutes);
 app.register(organizationRoutes);
+app.register(invitesRoutes);
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {

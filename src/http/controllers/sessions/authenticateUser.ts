@@ -15,8 +15,8 @@ export async function authenticateUser(
   const { email, password } = newUserBodySchema.parse(request.body);
 
   try {
-    const createNewUserUseCase = makeAuthenticateUserUseCase();
-    const { user } = await createNewUserUseCase.execute({
+    const authenticateUserUseCase = makeAuthenticateUserUseCase();
+    const { user } = await authenticateUserUseCase.execute({
       email,
       password,
     });
@@ -24,6 +24,7 @@ export async function authenticateUser(
     const token = await reply.jwtSign(
       {
         userType: user.userType,
+        org: user.partOfOrganizationId,
       },
       {
         sign: {
@@ -35,6 +36,7 @@ export async function authenticateUser(
     const refreshToken = await reply.jwtSign(
       {
         userType: user.userType,
+        org: user.partOfOrganizationId,
       },
       {
         sign: {
