@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
-import { ITasksRepository } from "../ITasksRepository";
+import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
+import { ITasksRepository } from '../ITasksRepository'
 
 export class PrismaTasksRepository implements ITasksRepository {
   async findById(taskId: bigint) {
@@ -8,9 +8,9 @@ export class PrismaTasksRepository implements ITasksRepository {
       where: {
         id: taskId,
       },
-    });
+    })
 
-    return task;
+    return task
   }
 
   async assignUser(taskListId: bigint, assigneeId: string): Promise<boolean> {
@@ -25,14 +25,15 @@ export class PrismaTasksRepository implements ITasksRepository {
           },
         },
       },
-    });
+    })
 
-    if (!result) return false;
+    if (!result) return false
 
-    return true;
+    return true
   }
+
   async create(data: Prisma.TaskCreateInput) {
-    const task = await prisma.task.create({ data });
-    return task;
+    const task = await prisma.task.create({ data })
+    return task
   }
 }

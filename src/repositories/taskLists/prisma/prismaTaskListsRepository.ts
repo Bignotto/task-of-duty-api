@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
-import { ITaskListsRepository } from "../ITaskListsRepository";
+import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
+import { ITaskListsRepository } from '../ITaskListsRepository'
 
 export class PrismaTaskListsRepository implements ITaskListsRepository {
   async addTaskToList(taskId: bigint, taskListId: bigint) {
@@ -15,9 +15,9 @@ export class PrismaTaskListsRepository implements ITaskListsRepository {
           },
         },
       },
-    });
+    })
 
-    return result;
+    return result
   }
 
   async findTaskListById(taskListId: bigint) {
@@ -25,9 +25,9 @@ export class PrismaTaskListsRepository implements ITaskListsRepository {
       where: {
         id: taskListId,
       },
-    });
+    })
 
-    return taskList;
+    return taskList
   }
 
   async getTaskListTasksById(taskListId: bigint) {
@@ -38,10 +38,10 @@ export class PrismaTaskListsRepository implements ITaskListsRepository {
       include: {
         tasks: true,
       },
-    });
+    })
 
-    if (!taskList || taskList.tasks.length === 0) return null;
-    return taskList.tasks;
+    if (!taskList || taskList.tasks.length === 0) return null
+    return taskList.tasks
   }
 
   async assignUser(taskListId: bigint, userId: string): Promise<boolean> {
@@ -56,33 +56,34 @@ export class PrismaTaskListsRepository implements ITaskListsRepository {
           },
         },
       },
-    });
+    })
 
-    if (!taskList) return false;
-    return true;
+    if (!taskList) return false
+    return true
   }
 
   async create(data: Prisma.TaskListCreateInput) {
     const list = await prisma.taskList.create({
       data,
-    });
+    })
 
-    return list;
+    return list
   }
+
   async addTask(taskId: bigint, taskListId: bigint) {
     const list = prisma.taskList.update({
       where: { id: taskListId },
       data: {
         tasks: { connect: { id: taskId } },
       },
-    });
+    })
 
-    return list;
+    return list
   }
 
   async getTaskListById(taskId: bigint) {
-    const list = await prisma.taskList.findUnique({ where: { id: taskId } });
+    const list = await prisma.taskList.findUnique({ where: { id: taskId } })
 
-    return list;
+    return list
   }
 }

@@ -1,17 +1,17 @@
-import { Organization, Prisma } from "@prisma/client";
-import { randomUUID } from "node:crypto";
-import { IOrganizationsRepository } from "../IOrganizationsRepository";
+import { Organization, Prisma } from '@prisma/client'
+import { randomUUID } from 'node:crypto'
+import { IOrganizationsRepository } from '../IOrganizationsRepository'
 
 export class InMemoryOrganizationsRepository
   implements IOrganizationsRepository
 {
-  public items: Organization[] = [];
+  public items: Organization[] = []
 
   async findByCnpj(cnpj: string): Promise<Organization | null> {
-    const organization = this.items.find((item) => item.cnpj === cnpj);
+    const organization = this.items.find((item) => item.cnpj === cnpj)
 
-    if (!organization) return null;
-    return organization;
+    if (!organization) return null
+    return organization
   }
 
   async create(data: Prisma.OrganizationCreateInput): Promise<Organization> {
@@ -21,18 +21,18 @@ export class InMemoryOrganizationsRepository
       fantasyName: data.fantasyName,
       name: data.name,
       ownerId: `${data.owner.connect?.id}`,
-    };
+    }
 
-    this.items.push(organization);
+    this.items.push(organization)
 
-    return organization;
+    return organization
   }
 
   async findById(organizationId: string) {
-    const organization = this.items.find((item) => item.id === organizationId);
+    const organization = this.items.find((item) => item.id === organizationId)
 
-    if (!organization) return null;
+    if (!organization) return null
 
-    return organization;
+    return organization
   }
 }

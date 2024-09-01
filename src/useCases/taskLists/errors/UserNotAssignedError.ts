@@ -1,5 +1,5 @@
 export class UserNotAssignedError extends Error {
   constructor() {
-    super("User not assigned to list.");
+    super('User not assigned to list.')
   }
 }

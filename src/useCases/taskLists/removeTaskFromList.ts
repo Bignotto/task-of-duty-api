@@ -1,9 +1,9 @@
-import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
-import { AssignmentError } from "./errors/AssignmentError";
+import { ITaskListsRepository } from '@/repositories/taskLists/ITaskListsRepository'
+import { AssignmentError } from './errors/AssignmentError'
 
 interface RemoveTaskFromListRequest {
-  taskListId: bigint;
-  taskId: bigint;
+  taskListId: bigint
+  taskId: bigint
 }
 
 export class RemoveTaskFromLisUseCase {
@@ -13,8 +13,8 @@ export class RemoveTaskFromLisUseCase {
     const result = await this.taskListsRepository.removeTaskFromList(
       taskListId,
       taskId,
-    );
+    )
 
-    if (!result) throw new AssignmentError();
+    if (!result) throw new AssignmentError()
   }
 }

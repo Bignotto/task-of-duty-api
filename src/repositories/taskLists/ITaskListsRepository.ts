@@ -1,26 +1,26 @@
-import { Prisma, Task, TaskList, User } from "@prisma/client";
+import { Prisma, Task, TaskList, User } from '@prisma/client'
 
 export interface TaskListUpdateInterface {
-  id: bigint;
-  title?: string;
-  description?: string;
+  id: bigint
+  title?: string
+  description?: string
 }
 export interface ITaskListsRepository {
-  create(data: Prisma.TaskListCreateInput): Promise<TaskList>;
-  addTaskToList(taskId: bigint, taskListId: bigint): Promise<TaskList | null>;
+  create(data: Prisma.TaskListCreateInput): Promise<TaskList>
+  addTaskToList(taskId: bigint, taskListId: bigint): Promise<TaskList | null>
 
-  findTaskListById(taskListId: bigint): Promise<TaskList | null>;
-  getTaskListTasksById(taskListId: bigint): Promise<Task[] | null>;
+  findTaskListById(taskListId: bigint): Promise<TaskList | null>
+  getTaskListTasksById(taskListId: bigint): Promise<Task[] | null>
 
-  assignUser(taskListId: bigint, userId: string): Promise<boolean>;
+  assignUser(taskListId: bigint, userId: string): Promise<boolean>
 
-  deleteTaskList(taskListId: bigint): Promise<void>;
+  deleteTaskList(taskListId: bigint): Promise<void>
 
-  updateTaskList(data: TaskListUpdateInterface): Promise<TaskList>;
+  updateTaskList(data: TaskListUpdateInterface): Promise<TaskList>
 
-  removeTaskFromList(taskListId: bigint, taskId: bigint): Promise<boolean>;
+  removeTaskFromList(taskListId: bigint, taskId: bigint): Promise<boolean>
 
-  getTaskListUsers(taskListId: bigint): Promise<User[]>;
+  getTaskListUsers(taskListId: bigint): Promise<User[]>
 
-  unassignUser(taskListId: bigint, userId: string): Promise<boolean>;
+  unassignUser(taskListId: bigint, userId: string): Promise<boolean>
 }

@@ -1,10 +1,10 @@
-import { InviteStatus, Prisma, UserInvite } from "@prisma/client";
-import { addDays } from "date-fns";
-import { randomUUID } from "node:crypto";
-import { IInvitesRepository } from "../IInvitesRepository";
+import { InviteStatus, Prisma, UserInvite } from '@prisma/client'
+import { addDays } from 'date-fns'
+import { randomUUID } from 'node:crypto'
+import { IInvitesRepository } from '../IInvitesRepository'
 
 export class InMemoryInvitesRepository implements IInvitesRepository {
-  public items: UserInvite[] = [];
+  public items: UserInvite[] = []
 
   async create(data: Prisma.UserInviteCreateInput) {
     const invite: UserInvite = {
@@ -15,17 +15,17 @@ export class InMemoryInvitesRepository implements IInvitesRepository {
       invitedPhone: data.invitedPhone,
       createDate: new Date(),
       status: InviteStatus.OPEN,
-    };
-    this.items.push(invite);
+    }
+    this.items.push(invite)
 
-    return invite;
+    return invite
   }
 
   async findById(id: string) {
-    const invite = this.items.find((item) => item.id === id);
+    const invite = this.items.find((item) => item.id === id)
 
-    if (!invite) return null;
+    if (!invite) return null
 
-    return invite;
+    return invite
   }
 }

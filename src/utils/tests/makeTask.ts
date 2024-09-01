@@ -1,15 +1,15 @@
-import { InMemoryTasksRepository } from "@/repositories/tasks/inMemory/inMemoryTasksRepository";
-import { fakerPT_BR as faker } from "@faker-js/faker";
-import { RecurrenceType, Task, TaskType } from "@prisma/client";
+import { InMemoryTasksRepository } from '@/repositories/tasks/inMemory/inMemoryTasksRepository'
+import { fakerPT_BR as faker } from '@faker-js/faker'
+import { RecurrenceType, Task, TaskType } from '@prisma/client'
 
 interface FakeTaskProps {
-  title?: string;
-  creatorId?: string;
-  description?: string;
-  recurrenceType?: RecurrenceType;
-  taskType?: TaskType;
-  dueDate?: Date;
-  organizationId?: string;
+  title?: string
+  creatorId?: string
+  description?: string
+  recurrenceType?: RecurrenceType
+  taskType?: TaskType
+  dueDate?: Date
+  organizationId?: string
 }
 
 export async function makeTask(
@@ -28,15 +28,15 @@ export async function makeTask(
       }),
     creator: {
       connect: {
-        id: props.creatorId ?? "USER ID",
+        id: props.creatorId ?? 'USER ID',
       },
     },
     organization: {
       connect: {
-        id: props.organizationId ?? "ORG ID",
+        id: props.organizationId ?? 'ORG ID',
       },
     },
-  });
+  })
 
-  return task;
+  return task
 }

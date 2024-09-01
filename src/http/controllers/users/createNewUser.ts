@@ -1,8 +1,8 @@
-import { EmailAlreadyInUseError } from "@/useCases/users/errors/EmailAlreadyInUseError";
-import { makeCreateNewUserUseCase } from "@/useCases/users/factories/makeCreateNewUserUseCase";
-import { UserType } from "@prisma/client";
-import { FastifyReply, FastifyRequest } from "fastify";
-import { z } from "zod";
+import { EmailAlreadyInUseError } from '@/useCases/users/errors/EmailAlreadyInUseError'
+import { makeCreateNewUserUseCase } from '@/useCases/users/factories/makeCreateNewUserUseCase'
+import { UserType } from '@prisma/client'
+import { FastifyReply, FastifyRequest } from 'fastify'
+import { z } from 'zod'
 
 export async function createNewUser(
   request: FastifyRequest,
@@ -14,29 +14,29 @@ export async function createNewUser(
     password: z.string().min(6),
     phone: z.string().optional(),
     userType: z.nativeEnum(UserType).optional(),
-  });
+  })
 
   const { name, email, password, phone, userType } = newUserBodySchema.parse(
     request.body,
-  );
+  )
 
   try {
-    const createNewUserUseCase = makeCreateNewUserUseCase();
+    const createNewUserUseCase = makeCreateNewUserUseCase()
     await createNewUserUseCase.execute({
       name,
       email,
       password,
       phone,
-    });
+    })
   } catch (error) {
     if (error instanceof EmailAlreadyInUseError) {
-      return reply.status(409).send({ message: error.message });
+      return reply.status(409).send({ message: error.message })
     }
 
-    throw error;
+    throw error
   }
 
-  return reply.status(201).send();
+  return reply.status(201).send()
 }
 
-//TODO: fix errors in this file
+// TODO: fix errors in this file

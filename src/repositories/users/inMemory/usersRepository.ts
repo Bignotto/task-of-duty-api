@@ -1,28 +1,28 @@
-import { Prisma, User, UserType } from "@prisma/client";
-import { randomUUID } from "node:crypto";
-import { IUsersRepository } from "../IUsersRepository";
+import { Prisma, User, UserType } from '@prisma/client'
+import { randomUUID } from 'node:crypto'
+import { IUsersRepository } from '../IUsersRepository'
 
 export class InMemoryUsersRepository implements IUsersRepository {
-  public items: User[] = [];
+  public items: User[] = []
 
   async findById(id: string) {
-    const user = this.items.find((item) => item.id === id);
+    const user = this.items.find((item) => item.id === id)
 
     if (!user) {
-      return null;
+      return null
     }
 
-    return user;
+    return user
   }
 
   async findByEmail(email: string) {
-    const user = this.items.find((item) => item.email === email);
+    const user = this.items.find((item) => item.email === email)
 
     if (!user) {
-      return null;
+      return null
     }
 
-    return user;
+    return user
   }
 
   async create(data: Prisma.UserCreateInput) {
@@ -33,27 +33,27 @@ export class InMemoryUsersRepository implements IUsersRepository {
       phone: data.phone!,
       userType: data.userType!,
       partOfOrganizationId:
-        data.partOfOrganization?.connect?.id ?? "nonono organization",
+        data.partOfOrganization?.connect?.id ?? 'nonono organization',
       passwordHash: data.passwordHash,
-    };
+    }
 
-    this.items.push(user);
+    this.items.push(user)
 
-    return user;
+    return user
   }
 
   async setUserType(userId: string, userType: UserType) {
-    const userIndex = this.items.findIndex((item) => item.id === userId);
-    this.items[userIndex].userType = userType;
+    const userIndex = this.items.findIndex((item) => item.id === userId)
+    this.items[userIndex].userType = userType
   }
 
   async setUserOrganization(
     userId: string,
     organizationId: string,
   ): Promise<User> {
-    const userIndex = this.items.findIndex((item) => item.id === userId);
-    this.items[userIndex].partOfOrganizationId = organizationId;
+    const userIndex = this.items.findIndex((item) => item.id === userId)
+    this.items[userIndex].partOfOrganizationId = organizationId
 
-    return this.items[userIndex];
+    return this.items[userIndex]
   }
 }
