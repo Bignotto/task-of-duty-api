@@ -1,3 +1,4 @@
+import { makeCreateNewInviteUseCase } from '@/useCases/invites/factories/makeCreateNewInviteUseCase'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -5,13 +6,6 @@ export async function createNewInvite(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  const { org } = request.user
-  if (!org)
-    return reply.status(401).send({
-      error: 'organization not assigned',
-      message: 'should be associated with an organization to send invites',
-    })
-
   const newInviteBodySchema = z.object({
     invitedPhone: z.string(),
     invitedEmail: z.string().optional(),
@@ -21,4 +15,19 @@ export async function createNewInvite(
   const { invitedPhone, invitedEmail, dueDate } = newInviteBodySchema.parse(
     request.body,
   )
+
+  try {
+    const createNewInviteUseCase = makeCreateNewInviteUseCase();
+    const invite = await createNewInviteUseCase.execute({
+      creatorId: request.user.sub,
+      invitedPhone,
+      dueDate,
+      invitedEmail
+    })
+
+    return reply.status(201).send({ invite })
+  } catch (error) {
+    return reply.status(500).send(error)
+  }
+
 }

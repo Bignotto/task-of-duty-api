@@ -2,13 +2,14 @@ import { InMemoryInvitesRepository } from '@/repositories/invites/inMemory/inMem
 import { InMemoryOrganizationsRepository } from '@/repositories/organizations/inMemory/organizationRepository'
 import { InMemoryUsersRepository } from '@/repositories/users/inMemory/usersRepository'
 import { Organization, User, UserType } from '@prisma/client'
-import { subDays } from 'date-fns'
+import { addDays, subDays } from 'date-fns'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { CreateNewInviteUseCase } from './createNewInvite'
 import { InvalidDateError } from './errors/InvalidDateError'
 import { InvalidPhoneNumberError } from './errors/InvalidPhoneError'
 import { NotFoundError } from './errors/NotFoundError'
 import { NotOrganizationAdminError } from './errors/NotOrganizationAdmin'
+import { makeUser } from '@/utils/tests/makeUser'
 
 let invitesRepository: InMemoryInvitesRepository
 let usersRepository: InMemoryUsersRepository
@@ -47,7 +48,6 @@ describe('Invite User Use Case', () => {
 
   it('organizations owner should be able to invite users', async () => {
     const { userInvite } = await sut.execute({
-      organizationId: organization.id,
       invitedPhone: '(12)34567-8901',
       creatorId: user.id,
     })
@@ -58,7 +58,6 @@ describe('Invite User Use Case', () => {
   it('should not be able to create an invite without a valid phone number', async () => {
     await expect(() =>
       sut.execute({
-        organizationId: organization.id,
         invitedPhone: 'invalid phone number',
         creatorId: user.id,
       }),
@@ -68,7 +67,6 @@ describe('Invite User Use Case', () => {
   it('should not be able to create an invite with invalid date', async () => {
     await expect(() =>
       sut.execute({
-        organizationId: organization.id,
         invitedPhone: '(12)34567-8901',
         dueDate: subDays(new Date(), 1), // yesterday
         creatorId: user.id,
@@ -86,7 +84,6 @@ describe('Invite User Use Case', () => {
 
     await expect(() =>
       sut.execute({
-        organizationId: organization.id,
         invitedPhone: '(12)34567-8901',
         creatorId: userTypeUser.id,
       }),
@@ -96,11 +93,24 @@ describe('Invite User Use Case', () => {
   it('should not be able to create an invite with invalid creator id', async () => {
     await expect(() =>
       sut.execute({
-        organizationId: organization.id,
         invitedPhone: '(12)34567-8901',
-        dueDate: subDays(new Date(), 1), // yesterday
+        dueDate: addDays(new Date(), 1),
         creatorId: 'some invalid id',
       }),
     ).rejects.toBeInstanceOf(NotFoundError)
   })
+
+  it('should not be able to create an invite without linked organization', async () => {
+    const someUser = await makeUser({
+      userType: 'USER'
+    }, usersRepository)
+
+    await expect(() =>
+      sut.execute({
+        invitedPhone: '(12)34567-8901',
+        dueDate: addDays(new Date(), 1),
+        creatorId: someUser.id,
+      }),
+    ).rejects.toBeInstanceOf(NotOrganizationAdminError)
+  });
 })

@@ -8,7 +8,6 @@ import { NotFoundError } from './errors/NotFoundError'
 import { NotOrganizationAdminError } from './errors/NotOrganizationAdmin'
 
 interface CreateNewInviteRequest {
-  organizationId: string
   creatorId: string
   invitedPhone: string
   invitedEmail?: string
@@ -23,10 +22,9 @@ export class CreateNewInviteUseCase {
   constructor(
     private invitesRepository: IInvitesRepository,
     private usersRepository: IUsersRepository,
-  ) {}
+  ) { }
 
   async execute({
-    organizationId,
     creatorId,
     invitedPhone,
     invitedEmail,
@@ -34,7 +32,11 @@ export class CreateNewInviteUseCase {
   }: CreateNewInviteRequest): Promise<CreateNewInviteResponse> {
     const creator = await this.usersRepository.findById(creatorId)
     if (!creator) throw new NotFoundError()
+
     if (creator.userType !== UserType.ORGANIZATION)
+      throw new NotOrganizationAdminError()
+
+    if (!creator.partOfOrganizationId)
       throw new NotOrganizationAdminError()
 
     const cleanedPhone = invitedPhone.replace(/[^0-9]/g, '')
@@ -45,7 +47,7 @@ export class CreateNewInviteUseCase {
     const userInvite = await this.invitesRepository.create({
       organization: {
         connect: {
-          id: organizationId,
+          id: creator.partOfOrganizationId,
         },
       },
       creator: {

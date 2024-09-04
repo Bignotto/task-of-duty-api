@@ -22,7 +22,7 @@ export async function makeUser(
     userType: props.userType ?? 'USER',
     partOfOrganization: {
       connect: {
-        id: props.orgId ?? faker.company.name(),
+        id: props.orgId ?? undefined,
       },
     },
   })
