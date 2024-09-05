@@ -17,12 +17,12 @@ describe('E2E Create Organization Controller', () => {
 
     const response = await request(app.server)
       .post('/organizations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Fake Organization',
         fantasyName: 'Fake Org',
         cnpj: '12345678901234',
       })
-      .set('Authorization', `Bearer ${token}`)
 
     expect(response.status).toEqual(201)
     expect(response.body.fantasyName).toEqual('Fake Org')

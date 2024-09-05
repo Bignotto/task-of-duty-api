@@ -31,6 +31,7 @@ export async function createNewOrganization(
     return reply.status(201).send(organization)
   } catch (error) {
     if (
+      //TODO: better not found error status code for reply
       error instanceof NotFoundError ||
       error instanceof CnpjAlreadyInUseError ||
       error instanceof CnpjLengthError

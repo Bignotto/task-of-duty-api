@@ -18,7 +18,7 @@ export async function createAuthenticatedUser(
     .send({
       email: 'dunha@gmail.com',
       name: props.name ?? faker.person.fullName(),
-      phone: props.phone ?? faker.phone.number(),
+      phone: props.phone ?? `99-99999-9999`,
       password: '123456',
     })
 
