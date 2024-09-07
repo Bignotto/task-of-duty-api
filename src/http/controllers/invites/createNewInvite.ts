@@ -25,7 +25,7 @@ export async function createNewInvite(
       invitedEmail
     })
 
-    return reply.status(201).send({ invite })
+    return reply.status(201).send(invite)
   } catch (error) {
     return reply.status(500).send(error)
   }

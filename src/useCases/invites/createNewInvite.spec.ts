@@ -47,12 +47,12 @@ describe('Invite User Use Case', () => {
   })
 
   it('organizations owner should be able to invite users', async () => {
-    const { userInvite } = await sut.execute({
+    const { invite } = await sut.execute({
       invitedPhone: '(12)34567-8901',
       creatorId: user.id,
     })
 
-    expect(userInvite.id).toEqual(expect.any(String))
+    expect(invite.id).toEqual(expect.any(String))
   })
 
   it('should not be able to create an invite without a valid phone number', async () => {

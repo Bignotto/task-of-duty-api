@@ -23,9 +23,7 @@ export async function createAndAssignOrganization(
       cnpj: props.cnpj ?? '56789012345678'
     })
 
-  //NEXT: implement create new invite e2e test
-
-  const { organization } = response.body;
+  const organization = response.body;
   return {
     organization,
   }
