@@ -15,7 +15,7 @@ interface CreateNewInviteRequest {
 }
 
 interface CreateNewInviteResponse {
-  userInvite: UserInvite
+  invite: UserInvite
 }
 
 export class CreateNewInviteUseCase {
@@ -60,6 +60,6 @@ export class CreateNewInviteUseCase {
       dueDate: dueDate || addDays(new Date(), 3),
     })
 
-    return { userInvite }
+    return { invite: userInvite }
   }
 }
