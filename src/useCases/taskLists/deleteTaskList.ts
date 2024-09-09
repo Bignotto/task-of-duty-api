@@ -1,13 +1,13 @@
-import { NotFoundError } from "@/globals/errors/NotFoundError";
-import { NotOrganizationAdminError } from "@/globals/errors/NotOrganizationAdminError";
-import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationError";
-import { ITaskListsRepository } from "@/repositories/taskLists/ITaskListsRepository";
-import { IUsersRepository } from "@/repositories/users/IUsersRepository";
-import { UserType } from "@prisma/client";
+import { NotFoundError } from '@/globals/errors/NotFoundError'
+import { NotOrganizationAdminError } from '@/globals/errors/NotOrganizationAdminError'
+import { NotSameOrganizationError } from '@/globals/errors/NotSameOrganizationError'
+import { ITaskListsRepository } from '@/repositories/taskLists/ITaskListsRepository'
+import { IUsersRepository } from '@/repositories/users/IUsersRepository'
+import { UserType } from '@prisma/client'
 
 interface DeleteTaskListRequest {
-  taskListId: bigint;
-  userId: string;
+  taskListId: bigint
+  userId: string
 }
 
 export class DeleteTaskListUseCase {
@@ -17,26 +17,25 @@ export class DeleteTaskListUseCase {
   ) {}
 
   async execute({ taskListId, userId }: DeleteTaskListRequest) {
-    const user = await this.usersRepository.findById(userId);
+    const user = await this.usersRepository.findById(userId)
     if (!user)
       throw new NotFoundError({
-        origin: "DeleteTaskListUseCase",
+        origin: 'DeleteTaskListUseCase',
         sub: userId,
-      });
+      })
     if (user.userType !== UserType.ORGANIZATION)
-      throw new NotOrganizationAdminError();
+      throw new NotOrganizationAdminError()
 
-    const taskList =
-      await this.taskListsRepository.findTaskListById(taskListId);
+    const taskList = await this.taskListsRepository.findTaskListById(taskListId)
     if (!taskList)
       throw new NotFoundError({
-        origin: "DeleteTaskListUseCase",
+        origin: 'DeleteTaskListUseCase',
         sub: taskListId.toString(),
-      });
+      })
 
     if (user.partOfOrganizationId !== taskList.organizationId)
-      throw new NotSameOrganizationError();
+      throw new NotSameOrganizationError()
 
-    await this.taskListsRepository.deleteTaskList(taskListId);
+    await this.taskListsRepository.deleteTaskList(taskListId)
   }
 }

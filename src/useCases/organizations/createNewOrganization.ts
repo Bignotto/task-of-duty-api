@@ -1,19 +1,19 @@
-import { NotFoundError } from "@/globals/errors/NotFoundError";
-import { IOrganizationsRepository } from "@/repositories/organizations/IOrganizationsRepository";
-import { IUsersRepository } from "@/repositories/users/IUsersRepository";
-import { Organization, UserType } from "@prisma/client";
-import { CnpjAlreadyInUseError } from "./errors/CnpjAlreadyInUseError";
-import { CnpjLengthError } from "./errors/CnpjLengthError";
+import { NotFoundError } from '@/globals/errors/NotFoundError'
+import { IOrganizationsRepository } from '@/repositories/organizations/IOrganizationsRepository'
+import { IUsersRepository } from '@/repositories/users/IUsersRepository'
+import { Organization, UserType } from '@prisma/client'
+import { CnpjAlreadyInUseError } from './errors/CnpjAlreadyInUseError'
+import { CnpjLengthError } from './errors/CnpjLengthError'
 
 interface CreateNewOrganizationRequest {
-  name: string;
-  fantasyName: string;
-  cnpj: string;
-  ownerId: string;
+  name: string
+  fantasyName: string
+  cnpj: string
+  ownerId: string
 }
 
 interface CreateNewOrganizationResponse {
-  organization: Organization;
+  organization: Organization
 }
 
 export class CreateNewOrganizationUseCase {
@@ -28,18 +28,18 @@ export class CreateNewOrganizationUseCase {
     cnpj,
     ownerId,
   }: CreateNewOrganizationRequest): Promise<CreateNewOrganizationResponse> {
-    if (cnpj.length !== 14) throw new CnpjLengthError();
+    if (cnpj.length !== 14) throw new CnpjLengthError()
 
     const organizationWithSameCnpj =
-      await this.organizationsRepository.findByCnpj(cnpj);
-    if (organizationWithSameCnpj) throw new CnpjAlreadyInUseError();
+      await this.organizationsRepository.findByCnpj(cnpj)
+    if (organizationWithSameCnpj) throw new CnpjAlreadyInUseError()
 
-    const userFound = await this.usersRepository.findById(ownerId);
+    const userFound = await this.usersRepository.findById(ownerId)
     if (!userFound)
       throw new NotFoundError({
         sub: ownerId,
-        origin: "CreateNewOrganizationUseCase",
-      });
+        origin: 'CreateNewOrganizationUseCase',
+      })
 
     const organization = await this.organizationsRepository.create({
       name,
@@ -50,11 +50,11 @@ export class CreateNewOrganizationUseCase {
           id: ownerId,
         },
       },
-    });
+    })
 
-    await this.usersRepository.setUserType(ownerId, UserType.ORGANIZATION);
-    await this.usersRepository.setUserOrganization(ownerId, organization.id);
+    await this.usersRepository.setUserType(ownerId, UserType.ORGANIZATION)
+    await this.usersRepository.setUserOrganization(ownerId, organization.id)
 
-    return { organization };
+    return { organization }
   }
 }

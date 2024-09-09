@@ -1,43 +1,45 @@
-import fastifyCookie from "@fastify/cookie";
-import fastifyJwt from "@fastify/jwt";
-import { fastify } from "fastify";
-import { ZodError } from "zod";
-import { env } from "./env";
-import organizationRoutes from "./http/controllers/organizations/routes";
-import { sessionRoutes } from "./http/controllers/sessions/routes";
-import { usersRoutes } from "./http/controllers/users/routes";
+import fastifyCookie from '@fastify/cookie'
+import fastifyJwt from '@fastify/jwt'
+import { fastify } from 'fastify'
+import { ZodError } from 'zod'
+import { env } from './env'
+import invitesRoutes from './http/controllers/invites/routes'
+import organizationRoutes from './http/controllers/organizations/routes'
+import { sessionRoutes } from './http/controllers/sessions/routes'
+import { usersRoutes } from './http/controllers/users/routes'
 
-export const app = fastify();
+export const app = fastify()
 
-app.register(fastifyCookie);
+app.register(fastifyCookie)
 
 app.register(fastifyJwt, {
   secret: env.THE_APP_SECRET,
   cookie: {
-    cookieName: "refreshToken",
+    cookieName: 'refreshToken',
     signed: false,
   },
   sign: {
-    expiresIn: "10m",
+    expiresIn: '10m',
   },
-});
+})
 
-app.register(usersRoutes);
-app.register(sessionRoutes);
-app.register(organizationRoutes);
+app.register(usersRoutes)
+app.register(sessionRoutes)
+app.register(organizationRoutes)
+app.register(invitesRoutes)
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {
     return reply
       .status(400)
-      .send({ message: "Validation error", issues: error.format() });
+      .send({ message: 'Validation error', issues: error.format() })
   }
 
-  if (env.NODE_ENV !== "production") {
-    console.error(error);
+  if (env.NODE_ENV !== 'production') {
+    console.error(error)
   } else {
-    //TODO: log unknown error
+    // TODO: log unknown error
   }
 
-  return reply.status(500).send({ message: "Unknown error..." });
-});
+  return reply.status(500).send({ message: 'Unknown error...' })
+})

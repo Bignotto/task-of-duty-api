@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
-import { $Enums, Prisma } from "@prisma/client";
-import { IUsersRepository } from "../IUsersRepository";
+import { prisma } from '@/lib/prisma'
+import { $Enums, Prisma } from '@prisma/client'
+import { IUsersRepository } from '../IUsersRepository'
 
 export class PrismaUsersRepository implements IUsersRepository {
   async findByEmail(email: string) {
@@ -8,13 +8,14 @@ export class PrismaUsersRepository implements IUsersRepository {
       where: {
         email,
       },
-    });
+    })
 
-    return user;
+    return user
   }
+
   async create(data: Prisma.UserCreateInput) {
-    const user = await prisma.user.create({ data });
-    return user;
+    const user = await prisma.user.create({ data })
+    return user
   }
 
   async findById(userId: string) {
@@ -22,9 +23,9 @@ export class PrismaUsersRepository implements IUsersRepository {
       where: {
         id: userId,
       },
-    });
+    })
 
-    return foundUser;
+    return foundUser
   }
 
   async setUserType(userId: string, userType: $Enums.UserType) {
@@ -35,8 +36,9 @@ export class PrismaUsersRepository implements IUsersRepository {
       data: {
         userType,
       },
-    });
+    })
   }
+
   async setUserOrganization(userId: string, organizationId: string) {
     const updatedUser = await prisma.user.update({
       where: {
@@ -49,8 +51,8 @@ export class PrismaUsersRepository implements IUsersRepository {
           },
         },
       },
-    });
+    })
 
-    return updatedUser;
+    return updatedUser
   }
 }

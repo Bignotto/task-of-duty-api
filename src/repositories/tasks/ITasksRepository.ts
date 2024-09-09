@@ -5,31 +5,31 @@ import {
   TaskDone,
   TaskType,
   User,
-} from "@prisma/client";
+} from '@prisma/client'
 
 export interface TaskUpdateInterface {
-  id: bigint;
-  title?: string;
-  description?: string;
-  recurrenceType?: RecurrenceType;
-  taskType?: TaskType;
-  dueDate?: Date;
+  id: bigint
+  title?: string
+  description?: string
+  recurrenceType?: RecurrenceType
+  taskType?: TaskType
+  dueDate?: Date
 }
 
 export interface ITasksRepository {
-  create(data: Prisma.TaskCreateInput): Promise<Task>;
+  create(data: Prisma.TaskCreateInput): Promise<Task>
 
-  findById(taskId: bigint): Promise<Task | null>;
+  findById(taskId: bigint): Promise<Task | null>
 
-  assignUser(taskId: bigint, assigneeId: string): Promise<boolean>;
+  assignUser(taskId: bigint, assigneeId: string): Promise<boolean>
 
-  markTaskDone(data: Prisma.TaskDoneCreateInput): Promise<TaskDone>;
+  markTaskDone(data: Prisma.TaskDoneCreateInput): Promise<TaskDone>
 
-  deleteTask(taskId: bigint): Promise<void>;
+  deleteTask(taskId: bigint): Promise<void>
 
-  updateTask(data: TaskUpdateInterface): Promise<Task>;
+  updateTask(data: TaskUpdateInterface): Promise<Task>
 
-  unassignUser(taskId: bigint, assigneeId: string): Promise<boolean>;
+  unassignUser(taskId: bigint, assigneeId: string): Promise<boolean>
 
-  getTaskUsers(taskId: bigint): Promise<User[]>;
+  getTaskUsers(taskId: bigint): Promise<User[]>
 }

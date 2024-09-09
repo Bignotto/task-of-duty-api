@@ -1,5 +1,5 @@
 export class AssignmentError extends Error {
   constructor() {
-    super("Error assigning list to user");
+    super('Error assigning list to user')
   }
 }

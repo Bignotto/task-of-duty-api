@@ -1,13 +1,13 @@
-import { NotFoundError } from "@/globals/errors/NotFoundError";
-import { NotOrganizationAdminError } from "@/globals/errors/NotOrganizationAdminError";
-import { NotSameOrganizationError } from "@/globals/errors/NotSameOrganizationError";
-import { ITasksRepository } from "@/repositories/tasks/ITasksRepository";
-import { IUsersRepository } from "@/repositories/users/IUsersRepository";
-import { UserType } from "@prisma/client";
+import { NotFoundError } from '@/globals/errors/NotFoundError'
+import { NotOrganizationAdminError } from '@/globals/errors/NotOrganizationAdminError'
+import { NotSameOrganizationError } from '@/globals/errors/NotSameOrganizationError'
+import { ITasksRepository } from '@/repositories/tasks/ITasksRepository'
+import { IUsersRepository } from '@/repositories/users/IUsersRepository'
+import { UserType } from '@prisma/client'
 
 interface DeleteTaskRequest {
-  taskId: bigint;
-  userId: string;
+  taskId: bigint
+  userId: string
 }
 export class DeleteTaskUseCase {
   constructor(
@@ -16,25 +16,25 @@ export class DeleteTaskUseCase {
   ) {}
 
   async execute({ taskId, userId }: DeleteTaskRequest) {
-    const user = await this.usersRepository.findById(userId);
+    const user = await this.usersRepository.findById(userId)
     if (!user)
       throw new NotFoundError({
-        origin: "DeleteTaskUseCase",
+        origin: 'DeleteTaskUseCase',
         sub: userId,
-      });
+      })
     if (user.userType !== UserType.ORGANIZATION)
-      throw new NotOrganizationAdminError();
+      throw new NotOrganizationAdminError()
 
-    const task = await this.tasksRepository.findById(taskId);
+    const task = await this.tasksRepository.findById(taskId)
     if (!task)
       throw new NotFoundError({
-        origin: "DeleteTaskUseCase",
+        origin: 'DeleteTaskUseCase',
         sub: taskId.toString(),
-      });
+      })
 
     if (user.partOfOrganizationId !== task.organizationId)
-      throw new NotSameOrganizationError();
+      throw new NotSameOrganizationError()
 
-    await this.tasksRepository.deleteTask(taskId);
+    await this.tasksRepository.deleteTask(taskId)
   }
 }
