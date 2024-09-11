@@ -13,10 +13,10 @@ export async function createNewUser(
     email: z.string(),
     password: z.string().min(6),
     phone: z.string().optional(),
-    userType: z.nativeEnum(UserType).optional(),
+    inviteId: z.string().optional(),
   })
 
-  const { name, email, password, phone, userType } = newUserBodySchema.parse(
+  const { name, email, password, phone, inviteId } = newUserBodySchema.parse(
     request.body,
   )
 
@@ -27,6 +27,7 @@ export async function createNewUser(
       email,
       password,
       phone,
+      inviteId
     })
   } catch (error) {
     if (error instanceof EmailAlreadyInUseError) {
