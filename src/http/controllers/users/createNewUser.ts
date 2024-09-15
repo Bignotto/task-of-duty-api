@@ -26,7 +26,7 @@ export async function createNewUser(
       email,
       password,
       phone,
-      inviteId
+      inviteId,
     })
   } catch (error) {
     if (error instanceof EmailAlreadyInUseError) {
@@ -38,5 +38,3 @@ export async function createNewUser(
 
   return reply.status(201).send()
 }
-
-// TODO: fix errors in this file

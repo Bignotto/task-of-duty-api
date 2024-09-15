@@ -5,7 +5,6 @@ import { ZodError } from 'zod'
 import { env } from './env'
 import { appRoutes } from './http/routes'
 
-
 export const app = fastify()
 
 app.register(fastifyCookie)
@@ -36,5 +35,5 @@ app.setErrorHandler((error, _, reply) => {
     // TODO: log unknown error
   }
 
-  return reply.status(500).send({ message: 'Unknown error...' })
+  return reply.status(500).send({ message: 'Unknown error...', error })
 })

@@ -1,16 +1,13 @@
-import pluginJs from "@eslint/js";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import { FlatCompat } from '@eslint/eslintrc'
+import js from '@eslint/js'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-
-export default [
-  { files: ["**/*.{js,mjs,cjs,ts}"] },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  {
-    languageOptions: { globals: globals.node },
-    rules: {
-      "max-len": ["error", { "code": 80, "ignoreStrings": true }]
-    }
-  },
-];
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
+})
+export default [...compat.extends('@rocketseat/eslint-config/node')]

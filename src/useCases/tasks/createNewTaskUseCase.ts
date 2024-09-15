@@ -1,8 +1,12 @@
+import { InvalidDateError } from '@/globals/errors/InvalidDateError'
 import { NotFoundError } from '@/globals/errors/NotFoundError'
+import { IOrganizationsRepository } from '@/repositories/organizations/IOrganizationsRepository'
 import { ITasksRepository } from '@/repositories/tasks/ITasksRepository'
 import { IUsersRepository } from '@/repositories/users/IUsersRepository'
 import { RecurrenceType, Task, TaskType, UserType } from '@prisma/client'
+import { isPast } from 'date-fns'
 import { NotOrganizationOwnerError } from './errors/NotOrganizationOwnerError'
+import { WrongOrganizationError } from './errors/WrongOrganizationError'
 
 interface CreateNewTaskRequest {
   title: string
@@ -22,7 +26,8 @@ export class CreateNewTaskUseCase {
   constructor(
     private tasksRepository: ITasksRepository,
     private usersRepository: IUsersRepository,
-  ) {}
+    private organizationsRepository: IOrganizationsRepository,
+  ) { }
 
   async execute({
     title,
@@ -33,20 +38,31 @@ export class CreateNewTaskUseCase {
     dueDate,
     organizationId,
   }: CreateNewTaskRequest): Promise<CreateNewTaskResponse> {
+    const pastDate = dueDate ? isPast(dueDate) : false;
+    if (pastDate) throw new InvalidDateError()
+
     const creator = await this.usersRepository.findById(creatorId)
     if (!creator)
       throw new NotFoundError({
-        origin: 'CreateNewTaskUseCase',
+        origin: 'CreateNewTaskUseCase:creatorId',
         sub: creatorId,
       })
 
-    // TODO: use global error
-    if (creator.userType !== UserType.ORGANIZATION)
-      throw new NotOrganizationOwnerError({
-        origin: 'CreateNewTaskUseCase',
+    if (creator.partOfOrganizationId) {
+      const org = await this.organizationsRepository.findById(organizationId)
+      if (!org) throw new NotFoundError({
+        origin: 'CreateNewTaskUseCase:organizationId',
+        sub: creator.partOfOrganizationId,
       })
 
-    // TODO: validate if due date is not in the past
+      if (creator.partOfOrganizationId !== organizationId) throw new WrongOrganizationError()
+
+      if (creator.userType !== UserType.ORGANIZATION)
+        throw new NotOrganizationOwnerError({
+          origin: 'CreateNewTaskUseCase',
+        })
+    }
+
 
     const task = await this.tasksRepository.create({
       title,
