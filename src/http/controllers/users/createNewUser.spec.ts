@@ -34,7 +34,7 @@ describe('E2E Create User Controller', () => {
       .post('/users')
       .send({
         name: faker.person.fullName(),
-        email: faker.internet.email(),
+        email: '99-99999-9999',
         password: '123456',
         invite: invite.id ?? undefined,
       })

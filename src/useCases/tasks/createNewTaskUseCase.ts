@@ -6,7 +6,6 @@ import { IUsersRepository } from '@/repositories/users/IUsersRepository'
 import { RecurrenceType, Task, TaskType, UserType } from '@prisma/client'
 import { isPast } from 'date-fns'
 import { NotOrganizationOwnerError } from './errors/NotOrganizationOwnerError'
-import { WrongOrganizationError } from './errors/WrongOrganizationError'
 
 interface CreateNewTaskRequest {
   title: string
@@ -15,7 +14,6 @@ interface CreateNewTaskRequest {
   taskType: TaskType
   creatorId: string
   dueDate?: Date
-  organizationId: string
 }
 
 interface CreateNewTaskResponse {
@@ -36,7 +34,6 @@ export class CreateNewTaskUseCase {
     taskType,
     creatorId,
     dueDate,
-    organizationId,
   }: CreateNewTaskRequest): Promise<CreateNewTaskResponse> {
     const pastDate = dueDate ? isPast(dueDate) : false;
     if (pastDate) throw new InvalidDateError()
@@ -49,13 +46,12 @@ export class CreateNewTaskUseCase {
       })
 
     if (creator.partOfOrganizationId) {
-      const org = await this.organizationsRepository.findById(organizationId)
-      if (!org) throw new NotFoundError({
-        origin: 'CreateNewTaskUseCase:organizationId',
-        sub: creator.partOfOrganizationId,
-      })
+      // const org = await this.organizationsRepository.findById(organizationId)
+      // if (!org) throw new NotFoundError({
+      //   origin: 'CreateNewTaskUseCase:organizationId',
+      //   sub: creator.partOfOrganizationId,
+      // })
 
-      if (creator.partOfOrganizationId !== organizationId) throw new WrongOrganizationError()
 
       if (creator.userType !== UserType.ORGANIZATION)
         throw new NotOrganizationOwnerError({
@@ -71,7 +67,7 @@ export class CreateNewTaskUseCase {
       creator: { connect: { id: creatorId } },
       recurrenceType,
       taskType,
-      organization: { connect: { id: organizationId } },
+      organization: creator.partOfOrganizationId ? { connect: { id: creator.partOfOrganizationId } } : undefined,
     })
 
     return { task }

@@ -18,9 +18,6 @@ describe('E2E Create task Controller', () => {
     const { token } = await createAuthenticatedUser(app)
     await createAndAssignOrganization(app, token, {})
 
-    // TODO: fix database to handle tasks without organizations
-    // TODO: fix create task use case to handle tasks without organizations
-
     const response = await request(app.server)
       .post('/tasks')
       .set('Authorization', `Bearer ${token}`)

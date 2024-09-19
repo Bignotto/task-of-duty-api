@@ -63,7 +63,7 @@ describe('Create New Task Use Case', () => {
       title: 'Find a story',
       recurrenceType: RecurrenceType.WEEKLY,
       taskType: TaskType.TASK,
-      organizationId: organization.id,
+      // organizationId: organization.id,
     })
 
     expect(task.id).toEqual(expect.any(BigInt))
@@ -87,7 +87,7 @@ describe('Create New Task Use Case', () => {
         title: 'Find a story',
         recurrenceType: RecurrenceType.WEEKLY,
         taskType: TaskType.TASK,
-        organizationId: organization.id,
+        // organizationId: organization.id,
       }),
     ).rejects.toBeInstanceOf(NotOrganizationOwnerError)
   })
@@ -100,7 +100,7 @@ describe('Create New Task Use Case', () => {
         title: 'Find a story',
         recurrenceType: RecurrenceType.WEEKLY,
         taskType: TaskType.TASK,
-        organizationId: organization.id,
+        // organizationId: organization.id,
       }),
     ).rejects.toBeInstanceOf(NotFoundError)
   })
@@ -113,7 +113,7 @@ describe('Create New Task Use Case', () => {
         title: 'Find a story',
         recurrenceType: RecurrenceType.WEEKLY,
         taskType: TaskType.TASK,
-        organizationId: organization.id,
+        // organizationId: organization.id,
         dueDate: subDays(new Date(), 2),
       }),
     ).rejects.toBeInstanceOf(InvalidDateError)

@@ -27,7 +27,6 @@ export async function createTask(request: FastifyRequest, reply: FastifyReply) {
       description,
       recurrenceType,
       creatorId: request.user.sub,
-      organizationId: request.user.org,
       taskType,
       dueDate,
     })

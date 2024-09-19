@@ -88,8 +88,8 @@ model Task {
 
   assignees User[]
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  organizationId String
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
   creator   User   @relation(name: "task_creator", fields: [creatorId], references: [id])
   creatorId String

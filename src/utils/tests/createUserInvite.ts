@@ -18,7 +18,7 @@ export async function createUserInvite(
     .post('/invites')
     .set('Authorization', `Bearer ${token}`)
     .send({
-      invitedPhone: props.invitedPhone ?? faker.phone.number(),
+      invitedPhone: props.invitedPhone ?? faker.string.numeric(11),
       invitedEmail: props.invitedEmail ?? faker.internet.email(),
       dueDate: props.dueDate ?? addDays(new Date(), 2)
     })
