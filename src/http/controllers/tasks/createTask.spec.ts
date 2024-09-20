@@ -16,6 +16,24 @@ describe('E2E Create task Controller', () => {
 
   it('should be able to create new task', async () => {
     const { token } = await createAuthenticatedUser(app)
+    // await createAndAssignOrganization(app, token, {})
+
+    const response = await request(app.server)
+      .post('/tasks')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'Task 1',
+        description: 'first ever task',
+        recurrenceType: 'MONTHLY',
+        taskType: 'TASK',
+        dueDate: addDays(new Date(), 2),
+      })
+
+    expect(response.status).toEqual(201)
+  })
+
+  it('should be able to create a task with linked organization', async () => {
+    const { token } = await createAuthenticatedUser(app)
     await createAndAssignOrganization(app, token, {})
 
     const response = await request(app.server)
