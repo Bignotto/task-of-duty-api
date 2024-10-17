@@ -29,7 +29,10 @@ describe('E2E Create task Controller', () => {
         dueDate: addDays(new Date(), 2),
       })
 
+    const task = JSON.parse(response.text)
+
     expect(response.status).toEqual(201)
+    expect(task.id).toEqual(expect.any(String))
   })
 
   it('should be able to create a task with linked organization', async () => {
@@ -47,6 +50,25 @@ describe('E2E Create task Controller', () => {
         dueDate: addDays(new Date(), 2),
       })
 
+    const task = JSON.parse(response.text)
+
     expect(response.status).toEqual(201)
+
+    expect(task.id).toEqual('2')
+    expect(task.organizationId).not.toBeNull()
+  })
+
+  it.only('should not be able to create a task without bearer token', async () => {
+    const response = await request(app.server)
+      .post('/tasks')
+      .send({
+        title: 'Task 1',
+        description: 'first ever task',
+        recurrenceType: 'MONTHLY',
+        taskType: 'TASK',
+        dueDate: addDays(new Date(), 2),
+      })
+
+    expect(response.status).toBe(401)
   })
 })

@@ -2,7 +2,7 @@ import { InvalidDateError } from '@/globals/errors/InvalidDateError'
 import { NotFoundError } from '@/globals/errors/NotFoundError'
 import { NotOrganizationOwnerError } from '@/useCases/tasks/errors/NotOrganizationOwnerError'
 import { WrongOrganizationError } from '@/useCases/tasks/errors/WrongOrganizationError'
-import { makeCreateNewTaskUseCase } from '@/useCases/tasks/factories/makeCreateTaskUseCase'
+import { makeCreateTaskUseCase } from '@/useCases/tasks/factories/makeCreateTaskUseCase'
 import { safeJson } from '@/utils/converters/safeJSON'
 import { RecurrenceType, TaskType } from '@prisma/client'
 import { FastifyReply, FastifyRequest } from 'fastify'
@@ -21,7 +21,7 @@ export async function createTask(request: FastifyRequest, reply: FastifyReply) {
     newTaskBodySchema.parse(request.body)
 
   try {
-    const createNewTaskUseCase = makeCreateNewTaskUseCase()
+    const createNewTaskUseCase = makeCreateTaskUseCase()
     const { task } = await createNewTaskUseCase.execute({
       title,
       description,

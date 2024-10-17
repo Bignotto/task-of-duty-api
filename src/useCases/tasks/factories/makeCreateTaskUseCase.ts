@@ -3,7 +3,7 @@ import { PrismaTasksRepository } from '@/repositories/tasks/prisma/prismaTasksRe
 import { PrismaUsersRepository } from '@/repositories/users/prisma/usersRepository'
 import { CreateNewTaskUseCase } from '../createNewTaskUseCase'
 
-export function makeCreateNewTaskUseCase() {
+export function makeCreateTaskUseCase() {
   const tasksRepository = new PrismaTasksRepository()
   const usersRepository = new PrismaUsersRepository()
   const organizationsRepository = new PrismaOrganizationsRepository()
@@ -14,5 +14,6 @@ export function makeCreateNewTaskUseCase() {
     organizationsRepository,
   )
 
+  console.log('factory makeCreateTaskUseCase')
   return createNewTaskUseCase
 }
